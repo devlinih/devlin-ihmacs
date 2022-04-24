@@ -30,7 +30,7 @@ will just be one "active" buffer which is focused.
 Things implemented here
 * Kill ring, a list of strings representing text that has been killed
   (infinite clipboard baby!)
-* Buffer list, a list of all buffer instances
+* Buffers, a list of all active buffers.
 * Global keymap
 
 ## Buffers

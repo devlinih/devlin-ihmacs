@@ -129,7 +129,7 @@ class Buffer:
         pass
 
     # Movement
-    def move_point(chars):
+    def move_point(self, chars):
         """
         Move point N chars.
 
@@ -138,7 +138,7 @@ class Buffer:
         """
         pass
 
-    def set_point(pos):
+    def set_point(self, pos):
         """
         Set point to position in buffer.
 
@@ -147,7 +147,7 @@ class Buffer:
         """
         pass
 
-    def set_mark(pos):
+    def set_mark(self, pos):
         """
         Set mark to position in buffer.
 
