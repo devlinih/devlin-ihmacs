@@ -3,6 +3,7 @@ Class representing the top level of an Ihmacs session.
 """
 
 from buffer import Buffer
+import curses
 
 
 class Ihmacs:
@@ -33,13 +34,16 @@ class Ihmacs:
         self.keymap = {}
         self.startup_directory = "~/"  # TODO: actually make it do as labeled.
 
-        # self.active_buffer = # Bit confused about this. If I say
-        # active_buffer is buffers[0] for example, will both
-        # active_buffer and buffers[0] point to the same buffer object?
-        # Or will it copy the object and make my life harder?
+        # self.stdscr = (idk how I would do the ncurses window and all with
+        # this)
 
-        # Create scratch buffer and buffer for files specified on the
-        # command line.
+        # self.active_buffer = # Bit confused about this. If I say
+        # active_buffer is buffers[0] for example, will both active_buffer and
+        # buffers[0] point to the same buffer object?  Or will it copy the
+        # object and make my life harder?
+
+        # Create scratch buffer and buffer for files specified on the command
+        # line.
 
     def run(self):
         """
