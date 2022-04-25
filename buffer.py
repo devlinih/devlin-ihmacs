@@ -54,8 +54,8 @@ class Buffer:
 
         # If path was passed load file
         # if self.path != "":
-            # TODO: Add error handling for if the file does not exist yet
-            # self.revert()
+        # TODO: Add error handling for if the file does not exist yet
+        # self.revert()
 
     # Properties
     @property
@@ -174,7 +174,7 @@ class Buffer:
         """
         Insert args at position in buffer.
 
-        Updates state of _text attribute.
+        Updates state of _text, _point, and _mark attributes.
 
         Args:
             pos: An int representing position in buffer to insert at.
@@ -194,7 +194,7 @@ class Buffer:
         """
         Delete text in region.
 
-        Updates state of _text attribute.
+        Updates state of _text, _point, and _mark attributes.
 
         Args:
             start: An int representing the start bound for the region.
@@ -210,7 +210,6 @@ class Buffer:
         self._text = self.text[:start] + self.text[end:]
 
         return deleted_text
-
 
     def delete_char(self, pos, chars=1):
         """
