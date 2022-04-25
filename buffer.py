@@ -53,9 +53,9 @@ class Buffer:
         self.display_line = 0
 
         # If path was passed load file
-        if self.path != "":
+        # if self.path != "":
             # TODO: Add error handling for if the file does not exist yet
-            self.revert()
+            # self.revert()
 
     # Properties
     @property
@@ -100,6 +100,21 @@ class Buffer:
         """
         return self._path
 
+    # Helper methods
+    def _normalize_pos(self, pos):
+        """
+        Normalize a point to ensure it lies in the range of the buffer.
+
+        The range of the buffer is from 0 to the length of the text.
+
+        Args:
+            pos: An int representing a point in the buffer.
+
+        Returns:
+            An int between 0 and the length of the text in the buffer.
+        """
+        return max(0, min(pos, len(self.text)))
+
     # Disk operations
     def revert(self):
         """
@@ -129,15 +144,6 @@ class Buffer:
         pass
 
     # Movement
-    def move_point(self, chars):
-        """
-        Move point N chars.
-
-        Args:
-            Chars: An int representing number of chars to move point.
-        """
-        pass
-
     def set_point(self, pos):
         """
         Set point to position in buffer.
@@ -145,7 +151,8 @@ class Buffer:
         Args:
            pos: An int representing where in the buffer to set point.
         """
-        pass
+        pos = self._normalize_pos(pos)
+        self._point = pos
 
     def set_mark(self, pos):
         """
@@ -154,7 +161,8 @@ class Buffer:
         Args:
             pos: An int representing where in the buffer to set mark.
         """
-        pass
+        pos = self._normalize_pos(pos)
+        self._mark = pos
 
     # Base editing operations
 
@@ -166,30 +174,60 @@ class Buffer:
         """
         Insert args at position in buffer.
 
+        Updates state of _text attribute.
+
         Args:
             pos: An int representing position in buffer to insert at.
             args: A tuple of strings to insert.
+
+        Returns:
+            A string representing the inserted text.
         """
-        pass
+        pos = self._normalize_pos(pos)
+
+        insert_text = "".join(args)
+        self._text = self.text[:pos] + insert_text + self.text[pos:]
+
+        return insert_text
+
+    def delete_region(self, start, end):
+        """
+        Delete text in region.
+
+        Updates state of _text attribute.
+
+        Args:
+            start: An int representing the start bound for the region.
+            end: An int representing the end obund for the region.
+
+        Returns:
+            A string containing all the deleted text.
+        """
+        start = self._normalize_pos(start)
+        end = self._normalize_pos(end)
+
+        deleted_text = self.text[start:end]
+        self._text = self.text[:start] + self.text[end:]
+
+        return deleted_text
+
 
     def delete_char(self, pos, chars=1):
         """
         Delete characters at position from buffer.
+
+        Updates state of _text attribute.
 
         Args:
             pos: An int representing position in buffer to delete at.
             chars: Number of characters to delete. If positive, delete
                 characters after point. If negative, delete characters before
                 point.
-        """
-        pass
 
-    def kill_region(self, start, end):
+        Returns:
+            A string containing the deleted text.
         """
-        Kill text and push to kill ring.
+        start = self._normalize_pos(pos)
+        end = self._normalize_pos(start + chars)
 
-        Args:
-            start: An int representing the start bound for the region.
-            end: An int representing the end obund for the region.
-        """
-        pass
+        return self.delete_region(start, end)
