@@ -26,7 +26,7 @@ class Ihmacs:
         Initialize instance of Ihmacs.
 
         Args:
-            files: A tuple of strings representing file paths to open as
+            *files: A tuple of strings representing file paths to open as
                 buffers.
         """
         self.kill_ring = []
