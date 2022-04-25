@@ -164,61 +164,44 @@ class Buffer:
         pos = self._normalize_pos(pos)
         self._mark = pos
 
-    # Base editing operations
+    # Base editing operations. These all return values because that will
+    # be useful for say, pushing to the kill ring.
 
-    # Note, these are the methods to manipulate the buffer. The editing
-    # commands defined at a higher will have the same names, but when
-    # calling this method will pass point and mark to these functions.
-
-    def insert(self, pos, *args):
+    def insert(self, *args):
         """
-        Insert args at position in buffer.
+        Insert args at point in buffer.
 
         Updates state of _text, _point, and _mark attributes.
 
         Args:
-            pos: An int representing position in buffer to insert at.
             args: A tuple of strings to insert.
 
         Returns:
             A string representing the inserted text.
         """
-        pos = self._normalize_pos(pos)
+        point = self.point
+        mark = self.mark
 
         insert_text = "".join(args)
-        self._text = self.text[:pos] + insert_text + self.text[pos:]
+        insert_len = len(insert_text)
 
+        # The side effects
+        self._text = self.text[:point] + insert_text + self.text[point:]
+        self._point = point + insert_len
+
+        if mark > point:
+            self._mark = mark + insert_len
+
+        # Return inserted text
         return insert_text
 
-    def delete_region(self, start, end):
+    def delete_char(self, chars=1):
         """
-        Delete text in region.
+        Delete characters from buffer at point.
 
         Updates state of _text, _point, and _mark attributes.
 
         Args:
-            start: An int representing the start bound for the region.
-            end: An int representing the end obund for the region.
-
-        Returns:
-            A string containing all the deleted text.
-        """
-        start = self._normalize_pos(start)
-        end = self._normalize_pos(end)
-
-        deleted_text = self.text[start:end]
-        self._text = self.text[:start] + self.text[end:]
-
-        return deleted_text
-
-    def delete_char(self, pos, chars=1):
-        """
-        Delete characters at position from buffer.
-
-        Updates state of _text attribute.
-
-        Args:
-            pos: An int representing position in buffer to delete at.
             chars: Number of characters to delete. If positive, delete
                 characters after point. If negative, delete characters before
                 point.
@@ -226,7 +209,52 @@ class Buffer:
         Returns:
             A string containing the deleted text.
         """
-        start = self._normalize_pos(pos)
-        end = self._normalize_pos(start + chars)
+        points = (self.point, self._normalize_pos(self.point + chars))
 
-        return self.delete_region(start, end)
+        # Rearrange due to negative args
+        start = min(points)
+        end = max(points)
+
+        # Info about what we are deleting
+        deleted_text = self.text[start:end]
+        deleted_len = len(deleted_text)
+
+        # The side effects
+        self._text = self.text[:start] + self.text[end:]
+
+        # If deleting text before point, move point backwards
+        if chars < 0:
+            self._point = start
+
+        # Handle the mark, move as would be expected
+        mark = self.mark
+
+        if start <= mark <= end:
+            self._mark = start
+        elif mark > end:
+            self._mark = mark - deleted_len
+
+        # Return deleted text
+        return deleted_text
+
+    def delete_region(self):
+        """
+        Delete text in region defined by point and mark.
+
+        Updates state of _text, _point, and _mark attributes.
+
+        Returns:
+            A string containing all the deleted text.
+        """
+        start = min(self.point, self.mark)
+        end = max(self.point, self.mark)
+
+        deleted_text = self.text[start:end]
+
+        # Side effects
+        self._text = self.text[:start] + self.text[end:]
+        self._point = start
+        self._mark = start
+
+        # Handle the return
+        return deleted_text
