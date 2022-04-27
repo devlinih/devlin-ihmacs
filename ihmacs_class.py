@@ -5,6 +5,8 @@ Class representing the top level of an Ihmacs session.
 from buff import Buffer
 from view import View
 from controller import Controller
+from constants import DEFAULT_GLOBAL_KEYMAP
+from basic_editing import *
 
 import curses
 
@@ -37,29 +39,74 @@ class Ihmacs:
             *files: A tuple of strings representing file paths to open as
                 buffers.
         """
+        # Global editor state
         self.kill_ring = []
         self.buffers = [Buffer("*scratch*")]
         self.active_buff = self.buffers[0]
-        self.keymap = {}
+        self.keymap = DEFAULT_GLOBAL_KEYMAP
         self.startup_directory = "~/"  # TODO: actually make it do as labeled.
         self.keychord = []
+
+        # The view and controller
         self.window = stdscr
         self.view = View(self.window, self.active_buff)
-        self.controller = Controller(
-            self.window, self.active_buff, self.keychord)
-
-        # Create scratch buffer and buffer for files specified on the command
-        # line.
+        self.controller = Controller(self.window,
+                                     self.active_buff,
+                                     self.keychord)
 
     def run(self):
         """
         Run the editor. Loop until exit.
         """
         view = self.view
-        buff = self.active_buff
+        controller = self.controller
+        keymap = self.keymap
+        keychord = self.keychord
 
-        char = ""
-        while char != "~":
+        # Loop
+        while True:
+            # Update display
             view.redraw_buffer()
-            char = self.window.getkey()
-            buff.insert(char)
+
+            # Read input
+            keychord.clear()
+            func = False
+            while not callable(func):
+                controller.read_key()
+                func = read_keychord_keymap(self.keychord, keymap)
+
+            # Act on input
+            controller.run_edit(func)
+
+
+def read_keychord_keymap(keychord, keymap):
+    """
+    Find the function that a keychord maps to in a keymap.
+
+    If the keychord does not terminate at a function, returns None.
+
+    If the keychord has an undefined mapping, return command_undefined (from
+    basic editing)
+
+    Args:
+        keychord: A list representing a keychord.
+        keymap: A dictionary representing a keymap.
+
+    Returns:
+        A function representing a mapping, a the command_undefined function if
+        the mapping is undefined, or False if the keychord is an incomplete mapping.
+    """
+    # If "keymap" is a function, return it
+    if callable(keymap):
+        return keymap
+
+    # If they keychord is empty, the map is incomplete.
+    if len(keychord) == 0:
+        return False
+
+    # If there is still input in the keychord, call recursively
+    key = keychord[0]
+    # Find what it maps to. If it maps to nothing, it maps to
+    # command_undefined
+    value = keymap.get(key, command_undefined)
+    return read_keychord_keymap(keychord[1:], value)

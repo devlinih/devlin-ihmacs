@@ -22,7 +22,7 @@ class Controller:
         Initialize controller.
 
         Args:
-            window: The ncurses window.
+            window: The global ncurses window.
             buff: The active buffer.
             keychord: The global keychord list, passed through.
         """
@@ -32,14 +32,16 @@ class Controller:
 
     def read_key(self):
         """
-        Read keychords from keyboard.
+        Read key from the user.
 
-        Returns:
-            An editing function that is mapped to in the keymap. If the
-            user types an invalid keychord, it returns an editing function that
-            prints invalid command.
+        Appends the read key to the global keychord.
         """
-        pass
+        window = self.window
+        keychord = self.keychord
+
+        # Side Effects
+        char = window.getkey()
+        keychord.append(char)
 
     def run_edit(self, func):
         """
@@ -48,4 +50,7 @@ class Controller:
         Args:
             func: A function to run on the buffer.
         """
-        pass
+        buff = self.buff
+        keychord = self.keychord
+
+        func(buff, keychord)

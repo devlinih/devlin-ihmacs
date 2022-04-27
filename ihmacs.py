@@ -21,4 +21,5 @@ def main(stdscr):
     ihmacs.run()
 
 
+# Run the program
 wrapper(main)
