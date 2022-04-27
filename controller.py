@@ -6,26 +6,31 @@ Has facilities for reading keychords and executing the associated command.
 
 import curses
 
+
 class Controller:
     """
     Ihmacs class for handling input and executing actions.
 
     Attributes:
-        stdscr: The ncurses window.
-        buffer: The active buffer.
+        window: The ncurses window we are reading from.
+        buff: The active buffer.
+        keychord: The global keychord.
     """
 
-    def __init__(self, window, buff):
+    def __init__(self, window, buff, keychord):
         """
         Initialize controller.
 
         Args:
             window: The ncurses window.
             buff: The active buffer.
+            keychord: The global keychord list, passed through.
         """
-        pass
+        self.window = window
+        self.buff = buff
+        self.keychord = keychord
 
-    def read_keychord(self):
+    def read_key(self):
         """
         Read keychords from keyboard.
 

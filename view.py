@@ -6,13 +6,14 @@ Views the active buffer.
 
 import curses
 
+
 class View:
     """
     Ihmacs class for displaying text in a terminal.
 
     Attributes:
-        stdscr: The ncurses window.
-        buffer: The active buffer.
+        window: The global ncurses window.
+        buff: The active buffer.
     """
 
     def __init__(self, window, buff):
@@ -23,10 +24,15 @@ class View:
             window: The ncurses window.
             buff: The active buffer.
         """
-        pass
+        self._window = window
+        self._buff = buff
 
     def redraw_buffer(self):
         """
         Redraw the buffer.
         """
-        pass
+        window = self._window
+        buff = self._buff
+        window.erase()
+        window.addstr(0, 0, buff.text)
+        window.refresh()

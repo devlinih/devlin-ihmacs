@@ -1,52 +1,24 @@
 """
-Class representing the top level of an Ihmacs session.
+Devlin Ihmacs editor.
 """
 
-from buffer import Buffer
-import curses
+from ihmacs_class import Ihmacs
+
+from curses import wrapper
 
 
-class Ihmacs:
+def main(stdscr):
     """
-    Class representing top level of an Ihmacs session.
+    Setup Ihmacs model and run.
 
-    Attributes:
-        kill_ring: A list (as a stack) of strings representing the kill ring.
-            For those not familiar with Emacs reading this code, this is a
-            clipboard, with infinite history of copies.
-        buffers: List of all active buffers.
-        keymap: A dictionary of dictionaries representing the global keymap.
-        active_buffer: The active buffer.
-        startup_directory: A string representing a path to the directory where
-            Ihmacs was started.
+    Args:
+        stdscr: An ncurses screen object. Required for ncurses wrapper.
     """
+    # clear screen
+    stdscr.clear
 
-    def __init__(self, *files):
-        """
-        Initialize instance of Ihmacs.
+    ihmacs = Ihmacs(stdscr)
+    ihmacs.run()
 
-        Args:
-            *files: A tuple of strings representing file paths to open as
-                buffers.
-        """
-        self.kill_ring = []
-        self.buffers = []
-        self.keymap = {}
-        self.startup_directory = "~/"  # TODO: actually make it do as labeled.
 
-        # self.stdscr = (idk how I would do the ncurses window and all with
-        # this)
-
-        # self.active_buffer = # Bit confused about this. If I say
-        # active_buffer is buffers[0] for example, will both active_buffer and
-        # buffers[0] point to the same buffer object?  Or will it copy the
-        # object and make my life harder?
-
-        # Create scratch buffer and buffer for files specified on the command
-        # line.
-
-    def run(self):
-        """
-        Run the editor. Loop until exit.
-        """
-        pass
+wrapper(main)
