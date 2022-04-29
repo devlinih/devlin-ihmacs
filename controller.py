@@ -32,16 +32,48 @@ class Controller:
 
     def read_key(self):
         """
-        Read key from the user.
+        Read keystroke from the user.
+
+        A stroke is a single sequence, so an alphanumeric plus modifier keys.
+
+        This will be appended to the global keychord in a string form.
 
         Appends the read key to the global keychord.
         """
         window = self.window
         keychord = self.keychord
 
+        # Read a keystroke. I am not an ncurses expert nor a c programmer so
+        # this is probably an awful way of doing this. Fully except that this
+        # code is garbage.
+        ch1 = window.getch()
+        key = ch1
+        meta = ""
+        if ch1 == 27: # ALT (META) was pressed
+            window.nodelay(True)
+            ch2 = window.getch() # Key pressed after alt
+            key = ch2
+            meta = "M-"
+            window.nodelay(False)
+            if ch2 == -1: # Invalid key combination, hey idk curses is cursed
+                return
+
+        # Convert the key into a bytestring that's a printable
+        # representation of the keystroke.
+        unctrl = curses.keyname(key)
+
+        # Check if control is pressed
+        if len(unctrl) > 1:
+            control = "C-"
+            char = chr(unctrl[1]).lower() # Downcase so it works with the Emacs
+                                          # convention of C-c instead of C-C
+        else:
+            control = ""
+            char = chr(unctrl[0])
+
         # Side Effects
-        char = window.getkey()
-        keychord.append(char)
+        keychord.append(control+meta+char)
+
 
     def run_edit(self, func):
         """

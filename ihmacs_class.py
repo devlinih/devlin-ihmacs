@@ -106,7 +106,6 @@ def read_keychord_keymap(keychord, keymap):
 
     # If there is still input in the keychord, call recursively
     key = keychord[0]
-    # Find what it maps to. If it maps to nothing, it maps to
-    # command_undefined
+    # Find what it maps to. If it maps to nothing, it maps to command_undefined
     value = keymap.get(key, command_undefined)
     return read_keychord_keymap(keychord[1:], value)

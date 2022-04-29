@@ -4,8 +4,7 @@ Devlin Ihmacs editor.
 
 from ihmacs_class import Ihmacs
 
-from curses import wrapper
-
+import curses
 
 def main(stdscr):
     """
@@ -14,12 +13,19 @@ def main(stdscr):
     Args:
         stdscr: An ncurses screen object. Required for ncurses wrapper.
     """
-    # clear screen
+    # Setup curses
+    curses.raw() # Raw input, doesn't translate codes like C-c to mean
+                 # terminate and kill the program
+    stdscr.keypad(False) # Chose to read inputs directly, was having
+                         # issues with alt/meta
+
+    # Clear screen at start
     stdscr.clear
 
+    # Create instance of editor and run
     ihmacs = Ihmacs(stdscr)
     ihmacs.run()
 
 
 # Run the program
-wrapper(main)
+curses.wrapper(main)
