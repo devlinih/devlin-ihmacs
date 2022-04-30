@@ -15,19 +15,20 @@ class Controller:
         window: The ncurses window we are reading from.
         buff: The active buffer.
         keychord: The global keychord.
+        ihmacs_state: The global state of the editor
     """
 
-    def __init__(self, **ihmacs_state):
+    def __init__(self, ihmacs_state):
         """
         Initialize controller.
 
         Args:
-            **keyargs: A keyarg list containing the entire global Ihmacs state.
+           ihmacs_state: An Ihmacs instance, the global state of the editor.
         """
         # Frequently used things in the controller, saved for convenience.
-        self.window = ihmacs_state["window"]
-        self.buff = ihmacs_state["active_buff"]
-        self.keychord = ihmacs_state["keychord"]
+        self.window = ihmacs_state.window
+        self.buff = ihmacs_state.active_buff
+        self.keychord = ihmacs_state.keychord
 
         # The entire global state, used less frequently
         self.ihmacs_state = ihmacs_state

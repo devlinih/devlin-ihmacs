@@ -26,6 +26,8 @@ class Ihmacs:
             Ihmacs was started.
         keychord: A list of strings representing the current keychord being
             inputted.
+        end_session: A bool representing whether or not to continue the editing
+            loop.
         window: The global ncurses window.
         view: The view in the MVC architecture.
         controller: The controller in the MVC architecture.
@@ -46,17 +48,12 @@ class Ihmacs:
         self.keymap = DEFAULT_GLOBAL_KEYMAP
         self.startup_directory = "~/"  # TODO: actually make it do as labeled.
         self.keychord = []
+        self.end_session = False
 
         # The view and controller
         self.window = stdscr
         self.view = View(self.window, self.active_buff)
-        self.controller = Controller(kill_ring=self.kill_ring,
-                                     buffers=self.buffers,
-                                     active_buff=self.active_buff,
-                                     keymap=self.keymap,
-                                     startup_directory=self.startup_directory,
-                                     keychord=self.keychord,
-                                     window=self.window,)
+        self.controller = Controller(self)
 
     def run(self):
         """
@@ -68,7 +65,7 @@ class Ihmacs:
         keychord = self.keychord
 
         # Loop
-        while True:
+        while not self.end_session:
             # Update display
             view.redraw_buffer()
 
