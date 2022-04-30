@@ -46,37 +46,66 @@ class Controller:
         window = self.window
         keychord = self.keychord
 
-        # Read a keystroke. I am not an ncurses expert nor a c programmer so
-        # this is probably an awful way of doing this. Fully except that this
-        # code is garbage.
-        ch1 = window.getch()
-        key = ch1
-        meta = ""
-        if ch1 == 27:  # ALT (META) was pressed
+        # Read keystroke. This code is designed to work whether keypad is
+        # enabled or not.
+
+        # Note: Pressing ESC yields some funky results with this code. It's
+        # treated like a sticky keys version of meta. Unfortunately, it can
+        # chain into itself, which would be confusing.
+        key = []
+        char = window.getch()
+        key.append(char)
+
+        while char != -1:
             window.nodelay(True)
-            ch2 = window.getch()  # Key pressed after alt
-            key = ch2
+            char = window.getch()
+            key.append(char)
+
+        window.nodelay(False)
+
+        # I know comment rants are not good style, but it's kind of
+        # needed to understand why the following code is the way it is.
+
+        # Convert the raw key array into a string that's human readable and
+        # consistent with the keymap dictionary.
+
+        # This portion of the code assumes keypad is enabled. I gave up trying
+        # to understand exactly how the terminal input was functioning, hence
+        # went to keypad.
+
+        # Unfortunately, this results in a few issues. Here's a brief list:
+        # First, ESC (as well as C-3) is treated the same as meta, just a
+        # sticky keys variant of it. It sends an escape code. Second, there is
+        # no difference between C-j and RET, C-i and TAB, etc. Third, don't
+        # even think about trying to decipher C- combinations that in the
+        # number row.
+
+        # Key was pressed with meta/ESC
+        if key[0] == 27:
             meta = "M-"
-            window.nodelay(False)
-            if ch2 == -1:  # Invalid key combination, hey idk curses is cursed
-                return
-
-        # Convert the key into a bytestring that's a printable
-        # representation of the keystroke.
-        unctrl = curses.keyname(key)
-
-        # Check if control is pressed
-        if len(unctrl) > 1:
-            control = "C-"
-            # Downcase so it works with the Emacs
-            char = chr(unctrl[1]).lower()
-            # convention of C-c instead of C-C
+            facekey = key[1]
         else:
-            control = ""
-            char = chr(unctrl[0])
+            meta = ""
+            facekey = key[0]
+
+        # Handle key characters.
+
+        # C-letter is reported as being from 1-26
+        control = ""
+        if 1 <= facekey <= 26:
+            control = "C-"
+            facekey = chr(curses.unctrl(facekey)[1]).lower()  # Extract letter
+        elif 32 <= facekey <= 126:  # Alphanumeric keys, standard ASCII
+            facekey = chr(facekey)
+        elif facekey == 127:  # DEL (backspace)
+            facekey = "DEL"
+        elif 128 <= facekey <= 255:  # Extended ASCII. Maybe your kbd has this?
+            facekey = chr(facekey)
+        elif facekey > curses.KEY_MIN:  # keypad keys.
+            facekey = curses.keyname(facekey).decode("utf-8")
 
         # Side Effects
-        keychord.append(control+meta+char)
+        keychord.append(control+meta+facekey)
 
     def run_edit(self, func):
         """
