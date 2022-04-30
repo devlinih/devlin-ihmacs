@@ -2,6 +2,8 @@
 Ihmacs buffer implementation.
 """
 
+import os
+
 
 class Buffer:
     """
@@ -120,12 +122,23 @@ class Buffer:
         """
         Revert buffer by reloading associated file.
 
+        Updates modified state to False.
+
         If the file does not exist, print error to *messages* buffer.
 
         Returns:
             A bool representing whether or not the revert was successful.
         """
-        pass
+        try:
+            path = self.path
+            with open(path, "r") as f:
+                self._text = f.read()
+
+            self._point = 0
+            self._mark = 0
+            self._modified = False
+        except:
+            pass
 
     def save_buffer(self):
         """
@@ -133,7 +146,14 @@ class Buffer:
 
         Updates modified state to False.
         """
-        pass
+        try:
+            path = self.path
+            with open(path, "w") as f:
+                f.write(self.text)
+
+            self._modified = False
+        except:
+            pass
 
     def write_file(self, path):
         """
@@ -141,7 +161,18 @@ class Buffer:
 
         Updates modified state to False.
         """
-        pass
+        try:
+            with open(path, "w") as f:
+                f.write(self.text)
+
+            self._path = path
+            self._modified = False
+            # TODO: Update buffer name to the file name. I should look
+            # into path handling in python so I don't end up hardcoding
+            # with unix forward slashes.
+
+        except:
+            pass
 
     # Movement
     def set_point(self, pos):
