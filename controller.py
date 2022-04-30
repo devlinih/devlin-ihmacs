@@ -17,18 +17,20 @@ class Controller:
         keychord: The global keychord.
     """
 
-    def __init__(self, window, buff, keychord):
+    def __init__(self, **ihmacs_state):
         """
         Initialize controller.
 
         Args:
-            window: The global ncurses window.
-            buff: The active buffer.
-            keychord: The global keychord list, passed through.
+            **keyargs: A keyarg list containing the entire global Ihmacs state.
         """
-        self.window = window
-        self.buff = buff
-        self.keychord = keychord
+        # Frequently used things in the controller, saved for convenience.
+        self.window = ihmacs_state["window"]
+        self.buff = ihmacs_state["active_buff"]
+        self.keychord = ihmacs_state["keychord"]
+
+        # The entire global state, used less frequently
+        self.ihmacs_state = ihmacs_state
 
     def read_key(self):
         """
@@ -49,13 +51,13 @@ class Controller:
         ch1 = window.getch()
         key = ch1
         meta = ""
-        if ch1 == 27: # ALT (META) was pressed
+        if ch1 == 27:  # ALT (META) was pressed
             window.nodelay(True)
-            ch2 = window.getch() # Key pressed after alt
+            ch2 = window.getch()  # Key pressed after alt
             key = ch2
             meta = "M-"
             window.nodelay(False)
-            if ch2 == -1: # Invalid key combination, hey idk curses is cursed
+            if ch2 == -1:  # Invalid key combination, hey idk curses is cursed
                 return
 
         # Convert the key into a bytestring that's a printable
@@ -65,15 +67,15 @@ class Controller:
         # Check if control is pressed
         if len(unctrl) > 1:
             control = "C-"
-            char = chr(unctrl[1]).lower() # Downcase so it works with the Emacs
-                                          # convention of C-c instead of C-C
+            # Downcase so it works with the Emacs
+            char = chr(unctrl[1]).lower()
+            # convention of C-c instead of C-C
         else:
             control = ""
             char = chr(unctrl[0])
 
         # Side Effects
         keychord.append(control+meta+char)
-
 
     def run_edit(self, func):
         """
@@ -82,7 +84,6 @@ class Controller:
         Args:
             func: A function to run on the buffer.
         """
-        buff = self.buff
-        keychord = self.keychord
+        ihmacs_state = self.ihmacs_state
 
-        func(buff, keychord)
+        func(ihmacs_state)

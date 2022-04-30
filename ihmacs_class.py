@@ -50,9 +50,13 @@ class Ihmacs:
         # The view and controller
         self.window = stdscr
         self.view = View(self.window, self.active_buff)
-        self.controller = Controller(self.window,
-                                     self.active_buff,
-                                     self.keychord)
+        self.controller = Controller(kill_ring=self.kill_ring,
+                                     buffers=self.buffers,
+                                     active_buff=self.active_buff,
+                                     keymap=self.keymap,
+                                     startup_directory=self.startup_directory,
+                                     keychord=self.keychord,
+                                     window=self.window,)
 
     def run(self):
         """
