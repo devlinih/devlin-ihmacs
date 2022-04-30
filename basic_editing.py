@@ -34,10 +34,13 @@ def insert(ihmacs_state, string):
     buff.insert(string)
 
 
-# TOOD: Remove this
-def test_insert1(ihmacs_state):
+# TODO: Make find_file actually open a file
+def find_file(ihmacs_state):
     """
-    test command, will delete later
+    Find and open a file.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
     insert(ihmacs_state,
            "This would open a file, had I implemented that yet")
@@ -55,6 +58,7 @@ def kill_ihmacs(ihmacs_state):
     ihmacs_state.end_session = True
 
 
+# TODO: Make this actually display the error message
 def command_undefined(ihmacs_state):
     """
     Tell user typed keychord is not mapped.
@@ -97,3 +101,15 @@ def backwards_delete_char(ihmacs_state, num=1):
     buff = ihmacs_state.active_buff
 
     buff.delete_char(-num)
+
+
+def newline(ihmacs_state, num=1):
+    """
+    Insert N newlines at point.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: Number of lines to insert. Must be 1 or greater.
+    """
+    for i in range(num):
+        insert(ihmacs_state, "\n")
