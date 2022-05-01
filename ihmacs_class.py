@@ -126,8 +126,12 @@ class Ihmacs:
             keychord.clear()
             func = False
             while not callable(func):
+                # Read keystrokes
                 controller.read_key()
-                func = read_keychord_keymap(self.keychord, keymap)
+                # Test for mapping
+                func = read_keychord_keymap(keychord, keymap)
+                # Echo the current keychord
+                view.echo(" ".join(keychord))
 
             # Act on input
             controller.run_edit(func)

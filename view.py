@@ -86,4 +86,23 @@ class View:
         Args:
             text: A string representing text to print in the echo area.
         """
-        pass
+        ihmacs_state = self.ihmacs_state
+        window = ihmacs_state.window
+
+        # Get dimensions of terminal
+        lines = curses.LINES
+        columns = curses.COLS
+
+        # Line to echo on, last line
+        display_line = lines - 1
+
+        # Get original location of cursor so we can return it
+        cursor_pos = window.getyx()
+
+        # Truncate the string if it is too long, adding indicator that it's
+        # truncated.
+        if len(text) > columns:
+            text = text[:-3] + "..."
+
+        window.addstr(display_line, 0, text)  # Echo at the bottom of the term
+        window.move(cursor_pos[0], cursor_pos[1])  # Restore cursor
