@@ -92,7 +92,11 @@ class Controller:
 
         # C-letter is reported as being from 1-26
         control = ""
-        if 1 <= facekey <= 26:
+
+        if facekey == 0:  # Apparently C-SPACE returns this
+            facekey = " "
+            control = "C-"
+        elif 1 <= facekey <= 26:
             control = "C-"
             facekey = chr(curses.unctrl(facekey)[1]).lower()  # Extract letter
         elif 32 <= facekey <= 126:  # Alphanumeric keys, standard ASCII
