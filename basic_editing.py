@@ -320,3 +320,77 @@ def scroll_down(ihmacs_state, num=1):
         num: The number of lines to scroll. If negative, scroll down.
     """
     scroll_up(ihmacs_state, num=-num)
+
+
+def forward_word(ihmacs_state, num=1):
+    """
+    Move point forward N words.
+
+    Places point at the end of a word.
+
+    A word is defined as being delimited by the mode specific word delimiters.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of words to move forward. If negative, move backwards.
+    """
+    if num == 0:
+        return
+    if num < 0:
+        backward_word(ihmacs_state, num=-num)
+        return
+
+    buff = ihmacs_state.active_buff
+    word_delimiters = buff.major_mode.word_delimiters_regex
+    text = buff.text
+    point = buff.point
+
+    delimiters = word_delimiters.finditer(text)
+    # Words end at the start of delimiters. Find all after point.
+    word_ends = [i.start() for i in delimiters if i.start() > point]
+
+    try:
+        # Find the end of the nth next word
+        new_point = word_ends[num-1]
+    except:
+        # If we are trying to go too far ahead, that means go to the
+        # last word, or just the end of the buffer.
+        new_point = point_max(ihmacs_state)
+    buff.set_point(new_point)
+
+
+def backward_word(ihmacs_state, num=1):
+    """
+    Move point backward N words.
+
+    Places point at the start of a word.
+
+    A word is defined as being delimited by the mode specific word delimiters.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of words to move backward. If negative, move forwards.
+    """
+    if num == 0:
+        return
+    if num < 0:
+        forward_word(ihmacs_state, num=-num)
+        return
+
+    buff = ihmacs_state.active_buff
+    word_delimiters = buff.major_mode.word_delimiters_regex
+    text = buff.text
+    point = buff.point
+
+    delimiters = word_delimiters.finditer(text)
+    # Words start at the end of delimiters. Find all before point.
+    word_starts = [i.end() for i in delimiters if i.end() < point]
+
+    try:
+        # Find the start of the nth previous word
+        new_point = word_starts[-num]
+    except:
+        # If we are trying to go too far back, that means go to the
+        # first word, or just the start of the buffer.
+        new_point = point_min(ihmacs_state)
+    buff.set_point(new_point)
