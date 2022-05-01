@@ -30,7 +30,8 @@ class Buffer:
             display information about the buffer as well as information about
             active modes by their "lighter" string.
         display_line: An int representing which line in the buffer is to be
-            displayed as the first line of a window in the view.
+            displayed as the first line of a window in the view. Line number
+            indexes at 1, as in, the first line is 1 not 0.
     """
 
     def __init__(self, name="**", path=""):
@@ -52,7 +53,8 @@ class Buffer:
         # self.keymap = dict of dicts, I'll get to this when I get to this.
         self.command_history = []
         self.modeline = ""
-        self.display_line = 0
+        # Index at 1 as Emacs and every other editor does for line number.
+        self.display_line = 1
 
         # If path was passed load file
         # if self.path != "":
@@ -102,7 +104,35 @@ class Buffer:
         """
         return self._path
 
+    @property
+    def line(self):
+        """
+        Return the line in the buffer the point is located at.
+        """
+        point = self.point
+        text_before_point = self.text[:point]
+        # Because of the bloody convention that the first line of text is 1 not
+        # 0 add 1
+        return 1 + text_before_point.count("\n")
+
+    @property
+    def column(self):
+        """
+        Return the column in the buffer the point is located at.
+        """
+        point = self.point
+        text = self.text
+        # Count how many characters it takes to find a newline char before
+        # point
+        col = 0
+        while point - col > 0:
+            if text[point-col-1] == "\n":  # Hard coding Unix newline...
+                return col
+            col += 1
+        return col
+
     # Helper methods
+
     def _normalize_pos(self, pos):
         """
         Normalize a point to ensure it lies in the range of the buffer.

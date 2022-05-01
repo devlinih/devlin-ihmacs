@@ -113,3 +113,31 @@ def newline(ihmacs_state, num=1):
     """
     for i in range(num):
         insert(ihmacs_state, "\n")
+
+
+def forward_char(ihmacs_state, num=1):
+    """
+    Move point forward N chars.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: Number of characters to move point. If negative, move point
+            backwards.
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    buff.set_point(point + num)
+
+
+def backward_char(ihmacs_state, num=1):
+    """
+    Move point backward N chars.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: Number of characters to move point. If negative, move point
+            forwards.
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    buff.set_point(point - num)

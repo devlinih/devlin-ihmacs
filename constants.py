@@ -18,8 +18,13 @@ from string import (
 DEFAULT_GLOBAL_KEYMAP = (
     {i: self_insert_command
      for i in ascii_letters+digits+punctuation+" "} |
-    {"C-x": {"C-f": find_file,
-             "C-c": kill_ihmacs, },
-     "C-j": newline,
-     "DEL": backwards_delete_char}
+    {"C-j": newline,
+     "DEL": backwards_delete_char,
+     "C-f": forward_char,
+     "KEY_RIGHT": forward_char,
+     "C-b": backward_char,
+     "KEY_LEFT": backward_char,
+     # Extended commands
+     "C-x": {"C-f": find_file,
+             "C-c": kill_ihmacs, }, }
 )
