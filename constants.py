@@ -30,6 +30,10 @@ DEFAULT_GLOBAL_KEYMAP = (
      "KEY_UP": previous_line,
      "C-a": move_beginning_of_line,
      "C-e": move_end_of_line,
+     "C-v": scroll_up,
+     "KEY_NPAGE": scroll_up,
+     "M-v": scroll_down,
+     "KEY_PPAGE": scroll_down,
      # Extended commands
      "C-x": {"C-f": find_file,
              "C-c": kill_ihmacs, }, }

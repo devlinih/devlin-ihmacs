@@ -4,6 +4,8 @@ Ihmacs controller module.
 Has facilities for reading keychords and executing the associated command.
 """
 
+from basic_editing import scroll_up
+
 import curses
 
 
@@ -115,9 +117,33 @@ class Controller:
         """
         Run an editing function on the active buffer.
 
+        If point moved, ensure it lies within a valid range of the view.
+
         Args:
             func: A function to run on the buffer.
         """
         ihmacs_state = self.ihmacs_state
-
         func(ihmacs_state)
+
+        # Ensure point lies within a valid range of the view.
+        self.ensure_valid_point()
+
+    def ensure_valid_point(self):
+        """
+        Ensure point lies within a valid range of the view.
+
+        If point has moved during editing such that it is out of view, scroll
+        the buffer accordingly.
+        """
+        ihmacs_state = self.ihmacs_state
+        buff = ihmacs_state.active_buff
+
+        # Check that point is on a line within the view area
+        view_min = buff.display_line
+        view_max = view_min + curses.LINES - 2
+        current_line = buff.line
+
+        if current_line < view_min:
+            buff.scroll_buffer(current_line-view_min)
+        if current_line >= view_max:
+            buff.scroll_buffer(current_line-view_max+1)

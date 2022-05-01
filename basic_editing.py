@@ -7,6 +7,8 @@ must be an Ihmacs object containing the global state of the editor.
 
 from buff import Buffer
 
+import curses
+
 
 def self_insert_command(ihmacs_state):
     """
@@ -222,6 +224,7 @@ def previous_line(ihmacs_state, num=1):
         return
     if num < 0:
         next_line(ihmacs_state, num=-num)
+        return
 
     buff = ihmacs_state.active_buff
     point = buff.point
@@ -256,6 +259,7 @@ def next_line(ihmacs_state, num=1):
         return
     if num < 0:
         previous_line(ihmacs_state, num=-num)
+        return
 
     buff = ihmacs_state.active_buff
     point = buff.point
@@ -273,3 +277,46 @@ def next_line(ihmacs_state, num=1):
     # Adjust point to be in the same column
     if original_col < newline_col:
         backward_char(ihmacs_state, newline_col-original_col)
+
+
+def scroll_up(ihmacs_state, num=1):
+    """
+    Scroll buffer up N lines.
+
+    By scroll up, it's as if the buffer was a piece of paper and you pushed up
+    on it. Scrolling up will actually show you further down in the buffer.
+
+    If point is moved out of the view, moves point accordingly.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of lines to scroll. If negative, scroll down.
+    """
+    buff = ihmacs_state.active_buff
+    buff.scroll_buffer(num)
+
+    # Check that point is on a line within the view area
+    view_min = buff.display_line
+    view_max = view_min + curses.LINES - 2
+    current_line = buff.line
+
+    if current_line < view_min:
+        next_line(ihmacs_state, view_min-current_line)
+    if current_line >= view_max:
+        previous_line(ihmacs_state, view_max-current_line+1)
+
+
+def scroll_down(ihmacs_state, num=1):
+    """
+    Scroll buffer down N lines.
+
+    By scroll down, it's as if the buffer was a piece of paper and you pushed
+    down on it. Scrolling down will actually show you further up in the buffer.
+
+    If point is moved out of the view, moves point accordingly.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of lines to scroll. If negative, scroll down.
+    """
+    scroll_up(ihmacs_state, num=-num)

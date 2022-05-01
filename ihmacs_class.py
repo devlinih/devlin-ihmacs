@@ -125,6 +125,8 @@ class Ihmacs:
             # Act on input
             controller.run_edit(func)
 
+            # If point has moved, make sure it lies within an allowed range.
+
 
 def read_keychord_keymap(keychord, keymap):
     """

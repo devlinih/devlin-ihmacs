@@ -57,8 +57,9 @@ class View:
             window.addstr(line, 0, text)
 
         # Redraw line with point
-        term_point_line = point_line+start_line
+        term_point_line = point_line-start_line
         point_line_text = display_text[term_point_line]
+
         if len(point_line_text) < term_cols:
             window.move(term_point_line, point_col)
         elif point_col < term_cols:
@@ -72,5 +73,7 @@ class View:
             start_index = point_col - term_cols + 2
             stop_index = term_cols - point_col + 2
             text = "$"+point_line_text[start_index:point_col]+"$"
+            window.addstr(term_point_line, 0, text)
             window.move(term_point_line, term_cols-1)
+
         window.refresh()
