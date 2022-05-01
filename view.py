@@ -16,23 +16,22 @@ class View:
         buff: The active buffer.
     """
 
-    def __init__(self, window, buff):
+    def __init__(self, ihmacs_state):
         """
         Initialize view.
 
         Args:
-            window: The ncurses window.
-            buff: The active buffer.
+            ihmacs_state: The global state of the editor as an Ihmacs instance.
         """
-        self._window = window
-        self._buff = buff
+        self.ihmacs_state = ihmacs_state
 
     def redraw_buffer(self):
         """
         Redraw the buffer.
         """
-        window = self._window
-        buff = self._buff
+        ihmacs_state = self.ihmacs_state
+        window = ihmacs_state.window
+        buff = ihmacs_state.active_buff
         point = buff.point
         # Line numbers index at 1, but Python indexes at 0.
         point_line = buff.line - 1

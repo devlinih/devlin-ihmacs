@@ -19,16 +19,16 @@ class Ihmacs:
         kill_ring: A list (as a stack) of strings representing the kill ring.
             For those not familiar with Emacs reading this code, this is a
             clipboard, with infinite history of copies.
-        buffers: List of all active buffers.
-        keymap: A dictionary of dictionaries representing the global keymap.
-        active_buffer: The active buffer.
-        startup_directory: A string representing a path to the directory where
+        _buffers: List of all active buffers.
+        _keymap: A dictionary of dictionaries representing the global keymap.
+        _active_buff: An int representing the index of the active buffer.
+        _startup_directory: A string representing a path to the directory where
             Ihmacs was started.
         keychord: A list of strings representing the current keychord being
             inputted.
         end_session: A bool representing whether or not to continue the editing
             loop.
-        window: The global ncurses window.
+        _window: The global ncurses window.
         view: The view in the MVC architecture.
         controller: The controller in the MVC architecture.
     """
@@ -38,22 +38,68 @@ class Ihmacs:
         Initialize instance of Ihmacs.
 
         Args:
+            stdscr: The main ncurses window. Argument exists so curses.wrapper
+                can pass it a window.
             *files: A tuple of strings representing file paths to open as
                 buffers.
         """
         # Global editor state
-        self.kill_ring = []
-        self.buffers = [Buffer("*scratch*")]
-        self.active_buff = self.buffers[0]
-        self.keymap = DEFAULT_GLOBAL_KEYMAP
-        self.startup_directory = "~/"  # TODO: actually make it do as labeled.
+        self._buffers = [Buffer("*scratch*")]
+        self._active_buff = 0
+        self._keymap = DEFAULT_GLOBAL_KEYMAP
+        self._startup_directory = "~/"  # TODO: actually make it do as labeled.
+
+        # This need to be mutated by the controller and are thus public.
         self.keychord = []
         self.end_session = False
+        self.kill_ring = []
 
         # The view and controller
-        self.window = stdscr
-        self.view = View(self.window, self.active_buff)
+        self._window = stdscr
+        self.view = View(self)
         self.controller = Controller(self)
+
+    @property
+    def buffers(self):
+        """
+        Return the list of all buffers.
+        """
+        return self._buffers
+
+    @property
+    def active_buff(self):
+        """
+        Return the active buffer.
+
+        Does NOT return the index of the active buffer.
+
+        Returns:
+            A buffer object representing the active buffer.
+        """
+        return self._buffers[self._active_buff]
+
+    @property
+    def keymap(self):
+        """
+        Return the global keymap.
+        """
+        return self._keymap
+
+    @property
+    def startup_directory(self):
+        """
+        Return the startup directory of the editor.
+        """
+        return self._startup_directory
+
+    @property
+    def window(self):
+        """
+        Return the main ncurses window.
+        """
+        return self._window
+
+    # Main loop
 
     def run(self):
         """
@@ -86,7 +132,7 @@ def read_keychord_keymap(keychord, keymap):
 
     If the keychord does not terminate at a function, returns None.
 
-    If the keychord has an undefined mapping, return command_undefined (from
+    If the keychord has an undefined mapping, return command_undefined(from
     basic editing)
 
     Args:
