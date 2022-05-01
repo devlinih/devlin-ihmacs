@@ -10,26 +10,26 @@ class Buffer:
     Ihmacs text buffer.
 
     Attributes:
-        text: A string representing the buffer text.
-        modified: A bool representing if the buffer has been modified since
+        _text: A string representing the buffer text.
+        _modified: A bool representing if the buffer has been modified since
             last save.
-        point: An int representing cursor position in file.
-        mark: An int representing the mark position in file. Used to define
+        _point: An int representing cursor position in file.
+        _mark: An int representing the mark position in file. Used to define
             the region.
-        name: A string representing the buffer name
-        path: A string representing the file path on the system associated with
+        _name: A string representing the buffer name
+        _path: A string representing the file path on the system associated with
             the buffer. This is the file the buffer is saved to.
-        major_mode: A major mode type representing the active major mode.
-        minor_modes: A list of minor modes representing the active minor modes.
-        keymap: not decided yet, but a sort of tree structure mapping inputted
+        _major_mode: A major mode type representing the active major mode.
+        _minor_modes: A list of minor modes representing the active minor modes.
+        _keymap: not decided yet, but a sort of tree structure mapping inputted
             keychords to editing methods. Are first class methods a thing or am
             I about to put myself into a world of hell?
-        command_history: A list of functions/methods that have been executed
+        _command_history: A list of functions/methods that have been executed
             since last save.
-        modeline: A string who's format method will generate a modeline. It can
+        _modeline: A string who's format method will generate a modeline. It can
             display information about the buffer as well as information about
             active modes by their "lighter" string.
-        display_line: An int representing which line in the buffer is to be
+        _display_line: An int representing which line in the buffer is to be
             displayed as the first line of a window in the view. Line number
             indexes at 1, as in, the first line is 1 not 0.
     """
@@ -51,10 +51,10 @@ class Buffer:
         # self.major_mode = instance of fundamental mode
         self.minor_modes = []
         # self.keymap = dict of dicts, I'll get to this when I get to this.
-        self.command_history = []
-        self.modeline = ""
+        self._command_history = []
+        self._modeline = ""
         # Index at 1 as Emacs and every other editor does for line number.
-        self.display_line = 1
+        self._display_line = 1
 
         # If path was passed load file
         # if self.path != "":
@@ -103,6 +103,13 @@ class Buffer:
         Return associated file path of buffer.
         """
         return self._path
+
+    @property
+    def display_line(self):
+        """
+        Return the display line for the buffer.
+        """
+        return self._display_line
 
     @property
     def line(self):
@@ -225,6 +232,22 @@ class Buffer:
         pos = self._normalize_pos(pos)
         self._mark = pos
 
+    def scroll_buffer(self, lines):
+        """
+        Scroll buffer by N lines.
+
+        Ensures that it will always be bound between 1 and the total number of
+        lines.
+
+        Args:
+            lines: An int representing the number of lines to scroll buffer.
+                Can be negative.
+        """
+        current_line = self.display_line
+        total_lines = len(self.text.split("\n"))
+
+        self._display_line = max(1, min(total_lines, current_line + lines))
+
     # Base editing operations. These all return values because that will
     # be useful for say, pushing to the kill ring.
 
@@ -252,6 +275,8 @@ class Buffer:
 
         if mark > point:
             self._mark = mark + insert_len
+
+        self._modified = True
 
         # Return inserted text
         return insert_text
@@ -295,6 +320,8 @@ class Buffer:
         elif mark > end:
             self._mark = mark - deleted_len
 
+        self._modified = True
+
         # Return deleted text
         return deleted_text
 
@@ -316,6 +343,8 @@ class Buffer:
         self._text = self.text[:start] + self.text[end:]
         self._point = start
         self._mark = start
+
+        self._modified = True
 
         # Handle the return
         return deleted_text
