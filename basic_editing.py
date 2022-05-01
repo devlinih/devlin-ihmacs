@@ -141,3 +141,135 @@ def backward_char(ihmacs_state, num=1):
     buff = ihmacs_state.active_buff
     point = buff.point
     buff.set_point(point - num)
+
+
+def point_max(ihmacs_state):
+    """
+    Return the maximum allowed point of the active buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buff = ihmacs_state.active_buff
+    text = buff.text
+    return len(text)
+
+
+# This function exists for if I were to add narrowing in the future.
+def point_min(ihmacs_state):
+    """
+    Return the minimum allowed point of the active buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    return 0
+
+
+def move_end_of_line(ihmacs_state):
+    """
+    Move point to start of the current line.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    text = buff.text
+    end_of_text = point_max(ihmacs_state)
+
+    while point < end_of_text:
+        if text[point] == "\n":
+            break
+        point += 1
+    buff.set_point(point)
+
+
+def move_beginning_of_line(ihmacs_state):
+    """
+    Move point to start of the current line.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    text = buff.text
+    start_of_text = point_min(ihmacs_state)
+
+    while point > start_of_text:
+        if text[point-1] == "\n":
+            break
+        point -= 1
+    buff.set_point(point)
+
+
+def previous_line(ihmacs_state, num=1):
+    """
+    Move up one line.
+
+    Attempts to keep column position between lines. If the previous line is
+    shorter than the original column position of the point, go to the end of
+    that line.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An int representing the number of lines to move. If negative, move
+            to the next line.
+
+    """
+    if num == 0:
+        return
+    if num < 0:
+        next_line(ihmacs_state, num=-num)
+
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    original_col = buff.column  # We try to preserve this
+
+    # Move to end of previous line. Do this NUM times.
+    for _ in range(num):
+        move_beginning_of_line(ihmacs_state)
+        backward_char(ihmacs_state)
+
+    newline_col = buff.column  # Number of columns in the current line
+
+    # Adjust point to be in the same column
+    if original_col < newline_col:
+        backward_char(ihmacs_state, newline_col-original_col)
+
+
+def next_line(ihmacs_state, num=1):
+    """
+    Move down one line.
+
+    Attempts to keep column position between lines. If the next line is shorter
+    than the original column position of the point, go to the end of that line.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An int representing the number of lines to move. If negative, move
+            to the next line.
+
+    """
+    if num == 0:
+        return
+    if num < 0:
+        previous_line(ihmacs_state, num=-num)
+
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    original_col = buff.column  # We try to preserve this
+
+    # Move to the start of next line. Do this NUM times.
+    for _ in range(num):
+        move_end_of_line(ihmacs_state)
+        forward_char(ihmacs_state)
+
+    # Move to end of line to find the total number of columns in the line.
+    move_end_of_line(ihmacs_state)
+    newline_col = buff.column  # Number of columns in the current line
+
+    # Adjust point to be in the same column
+    if original_col < newline_col:
+        backward_char(ihmacs_state, newline_col-original_col)

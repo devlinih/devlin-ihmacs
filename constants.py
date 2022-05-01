@@ -24,6 +24,12 @@ DEFAULT_GLOBAL_KEYMAP = (
      "KEY_RIGHT": forward_char,
      "C-b": backward_char,
      "KEY_LEFT": backward_char,
+     "C-n": next_line,
+     "KEY_DOWN": next_line,
+     "C-p": previous_line,
+     "KEY_UP": previous_line,
+     "C-a": move_beginning_of_line,
+     "C-e": move_end_of_line,
      # Extended commands
      "C-x": {"C-f": find_file,
              "C-c": kill_ihmacs, }, }
