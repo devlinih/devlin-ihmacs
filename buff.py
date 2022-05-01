@@ -33,13 +33,15 @@ class Buffer:
             indexes at 1, as in, the first line is 1 not 0.
     """
 
-    def __init__(self, name="**", path=""):
+    def __init__(self, name="**", path="", keymap={}):
         """
         Initialize buffer instance.
 
         Args:
             name: Keyarg, a string representing the buffer name.
             path: Keyarg, a string representing the associated file path.
+            keymap: The keymap to start off with. As this is a buffer, this is
+                the global keymap passed through.
         """
         self._text = ""
         self._modified = False
@@ -47,9 +49,11 @@ class Buffer:
         self._mark = 0
         self._name = name
         self._path = path
+
         self.major_mode = FundamentalMode()
         self.minor_modes = []
-        # self.keymap = dict of dicts, I'll get to this when I get to this.
+        self.keymap = keymap | self.major_mode.modemap
+
         self._command_history = []
         self._modeline = ""
         # Index at 1 as Emacs and every other editor does for line number.

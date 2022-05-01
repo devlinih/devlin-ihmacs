@@ -5,10 +5,16 @@ Class representing the top level of an Ihmacs session.
 from buff import Buffer
 from view import View
 from controller import Controller
-from constants import DEFAULT_GLOBAL_KEYMAP
+
 from basic_editing import *
 
 import curses
+
+from string import (
+    ascii_letters,
+    digits,
+    punctuation,
+)
 
 
 class Ihmacs:
@@ -44,9 +50,10 @@ class Ihmacs:
                 buffers.
         """
         # Global editor state
-        self._buffers = [Buffer("*scratch*")]
-        self._active_buff = 0
         self._keymap = DEFAULT_GLOBAL_KEYMAP
+        self._buffers = [Buffer(keymap=self._keymap,
+                                name="*scratch*")]
+        self._active_buff = 0
         self._startup_directory = "~/"  # TODO: actually make it do as labeled.
 
         # This need to be mutated by the controller and are thus public.
@@ -107,7 +114,7 @@ class Ihmacs:
         """
         view = self.view
         controller = self.controller
-        keymap = self.keymap
+        keymap = self.keymap  # This is just the global keymap
         keychord = self.keychord
 
         # Loop
@@ -116,6 +123,8 @@ class Ihmacs:
             view.redraw_buffer()
 
             # Read input
+            keymap = self.active_buff.keymap
+
             keychord.clear()
             func = False
             while not callable(func):
@@ -124,8 +133,6 @@ class Ihmacs:
 
             # Act on input
             controller.run_edit(func)
-
-            # If point has moved, make sure it lies within an allowed range.
 
 
 def read_keychord_keymap(keychord, keymap):
@@ -158,3 +165,29 @@ def read_keychord_keymap(keychord, keymap):
     # Find what it maps to. If it maps to nothing, it maps to command_undefined
     value = keymap.get(key, command_undefined)
     return read_keychord_keymap(keychord[1:], value)
+
+
+# The default global keymap.
+DEFAULT_GLOBAL_KEYMAP = (
+    {i: self_insert_command
+     for i in ascii_letters+digits+punctuation+" "} |
+    {"C-j": newline,
+     "DEL": backwards_delete_char,
+     "C-f": forward_char,
+     "KEY_RIGHT": forward_char,
+     "C-b": backward_char,
+     "KEY_LEFT": backward_char,
+     "C-n": next_line,
+     "KEY_DOWN": next_line,
+     "C-p": previous_line,
+     "KEY_UP": previous_line,
+     "C-a": move_beginning_of_line,
+     "C-e": move_end_of_line,
+     "C-v": scroll_up,
+     "KEY_NPAGE": scroll_up,
+     "M-v": scroll_down,
+     "KEY_PPAGE": scroll_down,
+     # Extended commands
+     "C-x": {"C-f": find_file,
+             "C-c": kill_ihmacs, }, }
+)
