@@ -109,6 +109,9 @@ class Controller:
             facekey = chr(facekey)
         elif facekey > curses.KEY_MIN:  # keypad keys.
             facekey = curses.keyname(facekey).decode("utf-8")
+            # Handle how different terminals handle this
+            if facekey == "KEY_BACKSPACE":
+                facekey = "DEL"
 
         # Side Effects
         keychord.append(control+meta+facekey)
