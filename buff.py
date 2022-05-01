@@ -2,8 +2,7 @@
 Ihmacs buffer implementation.
 """
 
-import os
-
+from fundamental_mode import FundamentalMode
 
 class Buffer:
     """
@@ -48,7 +47,7 @@ class Buffer:
         self._mark = 0
         self._name = name
         self._path = path
-        # self.major_mode = instance of fundamental mode
+        self.major_mode = FundamentalMode()
         self.minor_modes = []
         # self.keymap = dict of dicts, I'll get to this when I get to this.
         self._command_history = []

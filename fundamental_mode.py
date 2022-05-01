@@ -15,23 +15,47 @@ class FundamentalMode:
     Contains no syntax highlighting rules, indentation rules, or keymap.
 
     Attributes:
-        keymap: A dictionary of dictionaries representing the modemap.
+        _modemap: A dictionary of dictionaries representing the modemap. This
+            is the keymap specific to the mode.
+        _word_delimiters: A list of regular expressions used to represent what
+            the word delimiters are for the given mode. This is a list because
+            it's easier to expand or delete for other modes.
+        _word_delimiters_regex: A regex that is compiled from combining
+            everything in word_delimiters. Everything in word delimiters is
+            wrapped between "[" and "]+".
     """
 
-    keymap = {}
+    _modemap = {}
+    # Words are separated by whitespace, dashes, and underscores
+    _word_delimiters = [r"\s", r"\-", r"_"]
 
     def __init__(self):
         """
         Initialize fundamental mode.
         """
-        pass
+        # Compile the regex.
+        delimiters = self._word_delimiters
+        regex_string = "[" + "".join(delimiters) + "]+"
+        self._word_delimiters_regex = re.compile(regex_string)
 
-    def indent_line(self, pos, buff):
+    # Properties
+    @property
+    def modemap(self):
         """
-        Indents a line in a buffer.
+        Return the modemap dictionary.
+        """
+        return self._modemap
 
-        Args:
-            pos: An integer representing a location in a buffer.
-            buff: An Ihmacs buffer object.
+    @property
+    def word_delimiters(self):
         """
-        pass
+        Return the word delimiters list.
+        """
+        return self._word_delimiters
+
+    @property
+    def word_delimiters_regex(self):
+        """
+        Return the word delimiters regex.
+        """
+        return self._word_delimiters_regex
