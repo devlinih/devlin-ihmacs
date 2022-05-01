@@ -4,6 +4,7 @@ Ihmacs buffer implementation.
 
 from fundamental_mode import FundamentalMode
 
+
 class Buffer:
     """
     Ihmacs text buffer.
@@ -33,7 +34,7 @@ class Buffer:
             indexes at 1, as in, the first line is 1 not 0.
     """
 
-    def __init__(self, name="**", path="", keymap={}):
+    def __init__(self, name="**", path="", keymap=dict()):
         """
         Initialize buffer instance.
 
@@ -169,16 +170,13 @@ class Buffer:
         Returns:
             A bool representing whether or not the revert was successful.
         """
-        try:
-            path = self.path
-            with open(path, "r") as f:
-                self._text = f.read()
+        path = self.path
+        with open(path, "r") as f:
+            self._text = f.read()
 
-            self._point = 0
-            self._mark = 0
-            self._modified = False
-        except:
-            pass
+        self._point = 0
+        self._mark = 0
+        self._modified = False
 
     def save_buffer(self):
         """
@@ -186,14 +184,11 @@ class Buffer:
 
         Updates modified state to False.
         """
-        try:
-            path = self.path
-            with open(path, "w") as f:
-                f.write(self.text)
+        path = self.path
+        with open(path, "w") as f:
+            f.write(self.text)
 
-            self._modified = False
-        except:
-            pass
+        self._modified = False
 
     def write_file(self, path):
         """
@@ -201,20 +196,17 @@ class Buffer:
 
         Updates modified state to False.
         """
-        try:
-            with open(path, "w") as f:
-                f.write(self.text)
+        with open(path, "w") as f:
+            f.write(self.text)
 
-            self._path = path
-            self._modified = False
-            # TODO: Update buffer name to the file name. I should look
-            # into path handling in python so I don't end up hardcoding
-            # with unix forward slashes.
-
-        except:
-            pass
+        self._path = path
+        self._modified = False
+        # TODO: Update buffer name to the file name. I should look
+        # into path handling in python so I don't end up hardcoding
+        # with unix forward slashes.
 
     # Movement
+
     def set_point(self, pos):
         """
         Set point to position in buffer.

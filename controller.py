@@ -4,8 +4,6 @@ Ihmacs controller module.
 Has facilities for reading keychords and executing the associated command.
 """
 
-from basic_editing import scroll_up
-
 import curses
 
 

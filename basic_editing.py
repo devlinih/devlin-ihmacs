@@ -5,8 +5,6 @@ All these functions can take custom arguments, but the first argument
 must be an Ihmacs object containing the global state of the editor.
 """
 
-from buff import Buffer
-
 import curses
 
 
@@ -113,7 +111,7 @@ def newline(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: Number of lines to insert. Must be 1 or greater.
     """
-    for i in range(num):
+    for _ in range(num):
         insert(ihmacs_state, "\n")
 
 
@@ -168,6 +166,7 @@ def point_min(ihmacs_state):
     return 0
 
 
+# Should rewrite with regex
 def move_end_of_line(ihmacs_state):
     """
     Move point to start of the current line.
@@ -187,6 +186,7 @@ def move_end_of_line(ihmacs_state):
     buff.set_point(point)
 
 
+# Should rewrite with regex
 def move_beginning_of_line(ihmacs_state):
     """
     Move point to start of the current line.
@@ -206,6 +206,7 @@ def move_beginning_of_line(ihmacs_state):
     buff.set_point(point)
 
 
+# Should rewrite with regex
 def previous_line(ihmacs_state, num=1):
     """
     Move up one line.
@@ -227,7 +228,6 @@ def previous_line(ihmacs_state, num=1):
         return
 
     buff = ihmacs_state.active_buff
-    point = buff.point
     original_col = buff.column  # We try to preserve this
 
     # Move to end of previous line. Do this NUM times.
@@ -242,6 +242,7 @@ def previous_line(ihmacs_state, num=1):
         backward_char(ihmacs_state, newline_col-original_col)
 
 
+# Should rewrite with regex
 def next_line(ihmacs_state, num=1):
     """
     Move down one line.
@@ -262,7 +263,6 @@ def next_line(ihmacs_state, num=1):
         return
 
     buff = ihmacs_state.active_buff
-    point = buff.point
     original_col = buff.column  # We try to preserve this
 
     # Move to the start of next line. Do this NUM times.
@@ -352,7 +352,7 @@ def forward_word(ihmacs_state, num=1):
     try:
         # Find the end of the nth next word
         new_point = word_ends[num-1]
-    except:
+    except IndexError:
         # If we are trying to go too far ahead, that means go to the
         # last word, or just the end of the buffer.
         new_point = point_max(ihmacs_state)
@@ -389,7 +389,7 @@ def backward_word(ihmacs_state, num=1):
     try:
         # Find the start of the nth previous word
         new_point = word_starts[-num]
-    except:
+    except IndexError:
         # If we are trying to go too far back, that means go to the
         # first word, or just the start of the buffer.
         new_point = point_min(ihmacs_state)

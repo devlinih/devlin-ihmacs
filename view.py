@@ -27,12 +27,14 @@ class View:
 
     def redraw_buffer(self):
         """
-        Redraw the buffer.
+        Redraw the active buffer in the editing area.
+
+        Completely erases the ncurses window and draws the text in the buffer
+        in the editing area.
         """
         ihmacs_state = self.ihmacs_state
         window = ihmacs_state.window
         buff = ihmacs_state.active_buff
-        point = buff.point
         # Line numbers index at 1, but Python indexes at 0.
         point_line = buff.line - 1
         point_col = buff.column
@@ -50,7 +52,7 @@ class View:
         # Draw text
         display_text = text.split("\n")[start_line:start_line+display_lines]
         window.erase()
-        for line in range(len(display_text)):
+        for line, text in enumerate(display_text):
             text = display_text[line]
             if len(text) > term_cols:
                 text = text[:term_cols-1] + "$"
@@ -71,9 +73,17 @@ class View:
             window.move(term_point_line, term_cols-1)
         else:
             start_index = point_col - term_cols + 2
-            stop_index = term_cols - point_col + 2
             text = "$"+point_line_text[start_index:point_col]+"$"
             window.addstr(term_point_line, 0, text)
             window.move(term_point_line, term_cols-1)
 
         window.refresh()
+
+    def echo(self, text):
+        """
+        Print text in the echo area.
+
+        Args:
+            text: A string representing text to print in the echo area.
+        """
+        pass

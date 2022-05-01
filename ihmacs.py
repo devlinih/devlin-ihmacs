@@ -2,9 +2,9 @@
 Devlin Ihmacs editor.
 """
 
-from ihmacs_class import Ihmacs
-
 import curses
+
+from ihmacs_class import Ihmacs
 
 
 def main(stdscr):
@@ -19,7 +19,7 @@ def main(stdscr):
     # terminate and kill the program
 
     # Clear screen at start
-    stdscr.clear
+    stdscr.clear()
 
     # Create instance of editor and run
     ihmacs = Ihmacs(stdscr)

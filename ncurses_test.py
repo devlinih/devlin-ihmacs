@@ -8,6 +8,9 @@ import curses
 
 
 def main(window):
+    """
+    Main loop for testing script
+    """
     curses.raw()
     # window.keypad(False)
 
@@ -19,10 +22,10 @@ def main(window):
         window.addstr(0, 0, str(key))
 
         if key[0] == 27:
-            meta = "M-"
+            # meta = "M-"
             facekey = key[1]
         else:
-            meta = ""
+            # meta = ""
             facekey = key[0]
 
         facekey = curses.keyname(facekey)
@@ -32,17 +35,17 @@ def main(window):
 
 
 def get_key(window):
+    """
+    Read a keystroke from the terminal.
+    """
     key = []
     char = window.getch()
     key.append(char)
 
+    window.nodelay(True)
     while char != -1:
-        window.nodelay(True)
-        try:
-            char = window.getch()
-            key.append(char)
-        except:
-            char = False
+        char = window.getch()
+        key.append(char)
 
     window.nodelay(False)
 
