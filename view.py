@@ -32,6 +32,7 @@ class View:
         Completely erases ncurses window before drawing text. Then refreshes
         the window.
         """
+        curses.update_lines_cols()
         ihmacs_state = self.ihmacs_state
         window = ihmacs_state.window
 

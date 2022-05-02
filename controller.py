@@ -46,8 +46,8 @@ class Controller:
         window = self.window
         keychord = self.keychord
 
-        # Read keystroke. This code is designed to work whether keypad is
-        # enabled or not.
+        # Read keystroke. This code is designed assuming keypad is
+        # enabled. It only reads 2 characters in a keystroke.
 
         # Note: Pressing ESC yields some funky results with this code. It's
         # treated like a sticky keys version of meta. Unfortunately, it can
@@ -56,7 +56,8 @@ class Controller:
         char = window.getch()
         key.append(char)
 
-        while char != -1:
+        # If we have a meta-key combination (alt, or esc sequence).
+        if char == 27:
             window.nodelay(True)
             char = window.getch()
             key.append(char)
@@ -90,7 +91,7 @@ class Controller:
 
         # Handle key characters.
 
-        # C-letter is reported as being from 1-26
+        # C-letter is reported as being from 1-26, and 28-31. 27 is ESC.
         control = ""
 
         if facekey == 0:  # Apparently C-SPACE returns this
@@ -99,17 +100,26 @@ class Controller:
         elif 1 <= facekey <= 26:
             control = "C-"
             facekey = chr(curses.unctrl(facekey)[1]).lower()  # Extract letter
+        elif facekey == 27:  # ESC, the king of causing problems
+            facekey = "ESC"
+        elif 28 <= facekey <= 31:  # Various controls with glitchy effects
+            control = "C-"
+            facekey = chr(curses.unctrl(facekey)[1]).lower()
         elif 32 <= facekey <= 126:  # Alphanumeric keys, standard ASCII
             facekey = chr(facekey)
         elif facekey == 127:  # DEL (backspace)
             facekey = "DEL"
         elif 128 <= facekey <= 255:  # Extended ASCII. Maybe your kbd has this?
             facekey = chr(facekey)
-        elif facekey > curses.KEY_MIN:  # keypad keys.
+        elif facekey >= curses.KEY_MIN:  # keypad keys.
             facekey = curses.keyname(facekey).decode("utf-8")
             # Handle how different terminals handle this
             if facekey == "KEY_BACKSPACE":
                 facekey = "DEL"
+        else:
+            # Congratulations, you broke it! Let's just make it escape
+            # because chances are it's related to that.
+            facekey = "ESC"
 
         # Side Effects
         keychord.append(control+meta+facekey)
