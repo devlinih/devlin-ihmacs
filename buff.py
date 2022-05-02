@@ -52,7 +52,7 @@ class Buffer:
         self.major_mode = FundamentalMode()
         self.minor_modes = []
 
-        if keymape is None:
+        if keymap is None:
             keymap = {}
         self.keymap = keymap | self.major_mode.modemap
 
