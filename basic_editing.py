@@ -34,6 +34,22 @@ def insert(ihmacs_state, string):
     buff.insert(string)
 
 
+def message(ihmacs_state, string):
+    """
+    Print string in echo area and append to *messages* buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        string: A message to send.
+    """
+    # TODO: Append to *messages*. Will do after multiple buffers and
+    # switching has been implemented.
+
+    # Echo
+    controller = ihmacs_state.controller
+    controller.echo(string)
+
+
 # TODO: Make find_file actually open a file
 def find_file(ihmacs_state):
     """
@@ -42,8 +58,8 @@ def find_file(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    insert(ihmacs_state,
-           "This would open a file, had I implemented that yet")
+    message(ihmacs_state,
+            "This would open a file, had I implemented that.")
 
 
 def kill_ihmacs(ihmacs_state):
@@ -58,7 +74,6 @@ def kill_ihmacs(ihmacs_state):
     ihmacs_state.end_session = True
 
 
-# TODO: Make this actually display the error message
 def command_undefined(ihmacs_state):
     """
     Tell user typed keychord is not mapped.
@@ -66,7 +81,10 @@ def command_undefined(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    pass
+    keychord = ihmacs_state.keychord
+    keychord_string = " ".join(keychord)
+    error_message = f"{keychord_string} is undefined"
+    message(ihmacs_state, error_message)
 
 
 def delete_char(ihmacs_state, num=1):

@@ -123,14 +123,16 @@ class View:
         # Restore position of cursor
         window.move(cursor_y, cursor_x)
 
-    def echo(self, text):
+    def echo(self):
         """
-        Print text in the echo area.
+        Print the echo string in the echo area.
 
         Args:
             text: A string representing text to print in the echo area.
         """
         ihmacs_state = self.ihmacs_state
+        text = ihmacs_state.echo
+
         window = ihmacs_state.window
 
         # Get dimensions of terminal
@@ -149,4 +151,5 @@ class View:
             text = text[:-3] + "..."
 
         window.addstr(display_line, 0, text)  # Echo at the bottom of the term
+        window.clrtoeol()  # Clear any leftovers in echo area
         window.move(cursor_pos[0], cursor_pos[1])  # Restore cursor

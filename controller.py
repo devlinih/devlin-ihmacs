@@ -129,6 +129,16 @@ class Controller:
         # Ensure point lies within a valid range of the view.
         self.ensure_valid_point()
 
+    def echo(self, string):
+        """
+        Modify the echo string in the global Ihmacs instance.
+
+        Args:
+            string: A string to set the echo string to.
+        """
+        ihmacs_state = self.ihmacs_state
+        ihmacs_state.echo = string
+
     def ensure_valid_point(self):
         """
         Ensure point lies within a valid range of the view.

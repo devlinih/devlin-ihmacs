@@ -32,6 +32,7 @@ class Ihmacs:
         kill_ring: A list (as a stack) of strings representing the kill ring.
             For those not familiar with Emacs reading this code, this is a
             clipboard, with infinite history of copies.
+        echo: A string to display in the echo area.
         _window: The global ncurses window.
         view: The view in the MVC architecture.
         controller: The controller in the MVC architecture.
@@ -58,6 +59,7 @@ class Ihmacs:
         self.keychord = []
         self.end_session = False
         self.kill_ring = []
+        self.echo = ""
 
         # The view and controller
         self._window = stdscr
@@ -126,12 +128,18 @@ class Ihmacs:
             keychord.clear()
             func = False
             while not callable(func):
+                # Update echo area
+                view.echo()
+
                 # Read keystrokes
                 controller.read_key()
                 # Test for mapping
                 func = read_keychord_keymap(keychord, keymap)
                 # Echo the current keychord
-                view.echo(" ".join(keychord))
+                controller.echo(" ".join(keychord))
+
+            # Clear echo area
+            controller.echo("")
 
             # Act on input
             controller.run_edit(func)
