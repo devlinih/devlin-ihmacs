@@ -118,7 +118,7 @@ class Ihmacs:
         # Loop
         while not self.end_session:
             # Update display
-            view.redraw_buffer()
+            view.refresh_screen()
 
             # Read input
             keymap = self.active_buff.keymap

@@ -17,18 +17,16 @@ class Buffer:
         _mark: An int representing the mark position in file. Used to define
             the region.
         _name: A string representing the buffer name
-        _path: A string representing the file path on the system associated with
-            the buffer. This is the file the buffer is saved to.
-        _major_mode: A major mode type representing the active major mode.
-        _minor_modes: A list of minor modes representing the active minor modes.
+        _path: A string representing the file path on the system associated
+            with the buffer. This is the file the buffer is saved to.
+        major_mode: A major mode type representing the active major mode.
+        minor_modes: A list of minor modes representing the active minor
+            modes.
         _keymap: not decided yet, but a sort of tree structure mapping inputted
             keychords to editing methods. Are first class methods a thing or am
             I about to put myself into a world of hell?
         _command_history: A list of functions/methods that have been executed
             since last save.
-        _modeline: A string who's format method will generate a modeline. It can
-            display information about the buffer as well as information about
-            active modes by their "lighter" string.
         _display_line: An int representing which line in the buffer is to be
             displayed as the first line of a window in the view. Line number
             indexes at 1, as in, the first line is 1 not 0.
@@ -56,7 +54,6 @@ class Buffer:
         self.keymap = keymap | self.major_mode.modemap
 
         self._command_history = []
-        self._modeline = ""
         # Index at 1 as Emacs and every other editor does for line number.
         self._display_line = 1
 
@@ -141,6 +138,41 @@ class Buffer:
                 return col
             col += 1
         return col
+
+    @property
+    def modeline(self):
+        """
+        Generate buffer specific text to place on the modeline.
+
+        Takes information about the buffer and creates two formatted strings to
+        print at the left and right sides of the modeline.
+
+        Returns:
+            A tuple containing two strings. The first string is intended to be
+            displayed at the left of the modeline, and the 2nd is intended to
+            be displayed at the right of the modeline.
+        """
+        # Left Side
+        line = self.line
+        column = self.column
+        modified = self.modified
+        if modified:
+            modified_status = "-MOD-"
+        else:
+            modified_status = "SAVED"
+        name = self.name
+        total_lines = len(self.text.split("\n"))
+        scroll_percent = round(line/total_lines * 100)
+
+        left = f"{line}:{column} {modified_status}   {name}   {scroll_percent}%"
+
+        # Right Side
+        major_mode = self.major_mode
+        major_mode_name = major_mode.name
+
+        right = f"{major_mode_name}"
+
+        return (left, right)
 
     # Helper methods
 

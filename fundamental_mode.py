@@ -15,6 +15,7 @@ class FundamentalMode:
     Contains no syntax highlighting rules, indentation rules, or keymap.
 
     Attributes:
+        _name: A string representing a printed name of the mode.
         _modemap: A dictionary of dictionaries representing the modemap. This
             is the keymap specific to the mode.
         _word_delimiters: A list of regular expressions used to represent what
@@ -25,6 +26,7 @@ class FundamentalMode:
             wrapped between "[" and "]+".
     """
 
+    _name = "Fundamental"
     _modemap = {}
     # Words are separated by whitespace, dashes, and underscores
     _word_delimiters = [r"\s", r"\-", r"_"]
@@ -39,6 +41,13 @@ class FundamentalMode:
         self._word_delimiters_regex = re.compile(regex_string)
 
     # Properties
+    @property
+    def name(self):
+        """
+        Return the name of the mode as a string.
+        """
+        return self._name
+
     @property
     def modemap(self):
         """

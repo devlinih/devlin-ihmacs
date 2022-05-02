@@ -25,7 +25,22 @@ class View:
         """
         self.ihmacs_state = ihmacs_state
 
-    def redraw_buffer(self):
+    def refresh_screen(self):
+        """
+        Redraw the active buffer and the modeline.
+
+        Completely erases ncurses window before drawing text. Then refreshes
+        the window.
+        """
+        ihmacs_state = self.ihmacs_state
+        window = ihmacs_state.window
+
+        window.erase()
+        self._redraw_buffer()
+        self._draw_modeline()
+        window.refresh()
+
+    def _redraw_buffer(self):
         """
         Redraw the active buffer in the editing area.
 
@@ -51,7 +66,6 @@ class View:
 
         # Draw text
         display_text = text.split("\n")[start_line:start_line+display_lines]
-        window.erase()
         for line, text in enumerate(display_text):
             text = display_text[line]
             if len(text) > term_cols:
@@ -77,7 +91,37 @@ class View:
             window.addstr(term_point_line, 0, text)
             window.move(term_point_line, term_cols-1)
 
-        window.refresh()
+    def _draw_modeline(self):
+        """
+        Draw the modeline for the active buffer.
+
+        Does not clear the screen, assumed to be run after the screen is
+        cleared.
+        """
+        ihmacs_state = self.ihmacs_state
+        window = ihmacs_state.window
+        buff = ihmacs_state.active_buff
+        modeline_left, modeline_right = buff.modeline
+
+        # Get terminal size
+        term_lines = curses.LINES
+        term_columns = curses.COLS
+
+        # Get position of cursor to restore later
+        cursor_y, cursor_x = window.getyx()
+
+        # Find number of spaces needed to pad
+        padding = term_columns - (len(modeline_left) + len(modeline_right))
+
+        # Display the modeline on the 2nd to last line
+        modeline = modeline_left + " "*padding + modeline_right
+        if len(modeline) > term_columns:  # Truncate if too long
+            modeline = modeline[:term_columns-3] + "..."
+        window.addstr(term_lines-2, 0, modeline,
+                      curses.A_REVERSE)
+
+        # Restore position of cursor
+        window.move(cursor_y, cursor_x)
 
     def echo(self, text):
         """
