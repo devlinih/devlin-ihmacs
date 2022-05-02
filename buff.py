@@ -32,7 +32,7 @@ class Buffer:
             indexes at 1, as in, the first line is 1 not 0.
     """
 
-    def __init__(self, name="**", path="", keymap=dict()):
+    def __init__(self, name="**", path="", keymap=None):
         """
         Initialize buffer instance.
 
@@ -51,6 +51,9 @@ class Buffer:
 
         self.major_mode = FundamentalMode()
         self.minor_modes = []
+
+        if keymape is None:
+            keymap = {}
         self.keymap = keymap | self.major_mode.modemap
 
         self._command_history = []
