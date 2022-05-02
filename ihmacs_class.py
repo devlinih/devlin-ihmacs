@@ -3,16 +3,14 @@ Class representing the top level of an Ihmacs session.
 """
 
 import curses
-from string import (
-    ascii_letters,
-    digits,
-    punctuation,
-)
 
 from buff import Buffer
 from view import View
 from controller import Controller
-from basic_editing import *
+from basic_editing import (
+    command_undefined,
+    DEFAULT_GLOBAL_KEYMAP,
+)
 
 
 class Ihmacs:
@@ -187,31 +185,3 @@ def read_keychord_keymap(keychord, keymap):
     # Find what it maps to. If it maps to nothing, it maps to command_undefined
     value = keymap.get(key, command_undefined)
     return read_keychord_keymap(keychord[1:], value)
-
-
-# The default global keymap.
-DEFAULT_GLOBAL_KEYMAP = (
-    {i: self_insert_command
-     for i in ascii_letters+digits+punctuation+" "} |
-    {"C-j": newline,
-     "DEL": backwards_delete_char,
-     "C-f": forward_char,
-     "KEY_RIGHT": forward_char,
-     "M-f": forward_word,
-     "C-b": backward_char,
-     "KEY_LEFT": backward_char,
-     "M-b": backward_word,
-     "C-n": next_line,
-     "KEY_DOWN": next_line,
-     "C-p": previous_line,
-     "KEY_UP": previous_line,
-     "C-a": move_beginning_of_line,
-     "C-e": move_end_of_line,
-     "C-v": scroll_up,
-     "KEY_NPAGE": scroll_up,
-     "M-v": scroll_down,
-     "KEY_PPAGE": scroll_down,
-     # Extended commands
-     "C-x": {"C-f": find_file,
-             "C-c": kill_ihmacs, }, }
-)
