@@ -59,8 +59,7 @@ class View:
         start_line = buff.display_line - 1
 
         # Get terminal size
-        term_lines = curses.LINES
-        term_cols = curses.COLS
+        term_lines, term_cols = ihmacs_state.term_size
 
         # Editing area is all but the last 2 lines
         display_lines = term_lines - 2
@@ -105,19 +104,18 @@ class View:
         modeline_left, modeline_right = buff.modeline
 
         # Get terminal size
-        term_lines = curses.LINES
-        term_columns = curses.COLS
+        term_lines, term_cols = ihmacs_state.term_size
 
         # Get position of cursor to restore later
         cursor_y, cursor_x = window.getyx()
 
         # Find number of spaces needed to pad
-        padding = term_columns - (len(modeline_left) + len(modeline_right))
+        padding = term_cols - (len(modeline_left) + len(modeline_right))
 
         # Display the modeline on the 2nd to last line
         modeline = modeline_left + " "*padding + modeline_right
-        if len(modeline) > term_columns:  # Truncate if too long
-            modeline = modeline[:term_columns-3] + "..."
+        if len(modeline) > term_cols:  # Truncate if too long
+            modeline = modeline[:term_cols-3] + "..."
         window.addstr(term_lines-2, 0, modeline,
                       curses.A_REVERSE)
 
@@ -137,18 +135,17 @@ class View:
         window = ihmacs_state.window
 
         # Get dimensions of terminal
-        lines = curses.LINES
-        columns = curses.COLS
+        term_lines, term_cols = ihmacs_state.term_size
 
         # Line to echo on, last line
-        display_line = lines - 1
+        display_line = term_lines - 1
 
         # Get original location of cursor so we can return it
         cursor_pos = window.getyx()
 
         # Truncate the string if it is too long, adding indicator that it's
         # truncated.
-        if len(text) > columns:
+        if len(text) > term_cols:
             text = text[:-3] + "..."
 
         window.addstr(display_line, 0, text)  # Echo at the bottom of the term

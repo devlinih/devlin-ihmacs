@@ -5,8 +5,6 @@ All these functions can take custom arguments, but the first argument
 must be an Ihmacs object containing the global state of the editor.
 """
 
-import curses
-
 
 def self_insert_command(ihmacs_state):
     """
@@ -313,9 +311,12 @@ def scroll_up(ihmacs_state, num=1):
     buff = ihmacs_state.active_buff
     buff.scroll_buffer(num)
 
+    # Get terminal size
+    term_lines, _ = ihmacs_state.term_size
+
     # Check that point is on a line within the view area
     view_min = buff.display_line
-    view_max = view_min + curses.LINES - 2
+    view_max = view_min + term_lines - 2
     current_line = buff.line
 
     if current_line < view_min:

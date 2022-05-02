@@ -106,6 +106,17 @@ class Ihmacs:
         """
         return self._window
 
+    @property
+    def term_size(self):
+        """
+        Return terminal size.
+
+        Updates
+
+        Return a tuple of two ints representing the terminal size as (y, x)
+        """
+        return (curses.LINES, curses.COLS)
+
     # Main loop
 
     def run(self):
