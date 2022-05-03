@@ -53,16 +53,16 @@ class FundamentalMode:
     @property
     def word_delimiters_regex(self):
         """
-        Return the word delimiters regex.
+        Return the regex that finds word delimiters.
         """
         delimiters = self.word_delimiters
         regex_str = "[" + "".join(delimiters) + "]+"
-        self._word_delimiters_regex = re.compile(regex_str)
+        return re.compile(regex_str)
 
     @property
     def word_regex(self):
         """
-        Return the regex that finds
+        Return the regex that finds words.
         """
         delimiters = self.word_delimiters
         regex_str = "[^" + "".join(delimiters) + "]+"
