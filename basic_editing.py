@@ -524,7 +524,9 @@ DEFAULT_GLOBAL_KEYMAP = (
     {i: self_insert_command
      for i in ascii_letters+digits+punctuation+" "} |
     {"C-j": newline,
-     "DEL": backwards_delete_char,
+     "DEL": backwards_delete_char,  # Backspace
+     "KEY_DC": delete_char,  # Delete
+     "C-d": delete_char,
      "C-f": forward_char,
      "KEY_RIGHT": forward_char,
      "M-f": forward_word,
@@ -536,7 +538,9 @@ DEFAULT_GLOBAL_KEYMAP = (
      "C-p": previous_line,
      "KEY_UP": previous_line,
      "C-a": move_beginning_of_line,
+     "KEY_HOME": move_beginning_of_line,
      "C-e": move_end_of_line,
+     "KEY_END": move_end_of_line,
      "C-v": scroll_up,
      "KEY_NPAGE": scroll_up,
      "M-v": scroll_down,
