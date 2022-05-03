@@ -5,6 +5,9 @@ All these functions can take custom arguments, but the first argument
 must be an Ihmacs object containing the global state of the editor.
 """
 
+
+import re
+
 from string import (
     ascii_letters,
     digits,
@@ -188,7 +191,112 @@ def point_min(ihmacs_state):
     return 0
 
 
-# Should rewrite with regex
+def forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Move point forward by N units separated by a delimiter.
+
+    This command is used to define other commands such as forward_word.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to move forward.
+    """
+    if num == 0:
+        return
+    if num < 0:
+        backward_by_delimiter(ihmacs_state, delimiter_regex, num=-num)
+        return
+
+    buff = ihmacs_state.active_buff
+    text = buff.text
+    point = buff.point
+
+    delimiters = delimiter_regex.finditer(text)
+    # Units end at the start of delimiters. Find all ends after point.
+    unit_ends = [i.start() for i in delimiters if i.start() > point]
+
+    try:
+        # Find the end of the nth next unit
+        new_point = unit_ends[num-1]
+    except IndexError:
+        # If we are trying to go too far ahead, that means we are in the
+        # last unit already. Move to the end of it.
+        new_point = point_max(ihmacs_state)
+    buff.set_point(new_point)
+
+
+def backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Move point backward by N units separated by a delimiter.
+
+    This command is used to define the behavior of forward_by_delimiter with a
+    negative argument.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to move backward.
+    """
+    if num == 0:
+        return
+    if num < 0:
+        forward_by_delimiter(ihmacs_state, delimiter_regex, num=-num)
+        return
+
+    buff = ihmacs_state.active_buff
+    text = buff.text
+    point = buff.point
+
+    delimiters = delimiter_regex.finditer(text)
+    # Units start at the end of delimiters. Find all starts before point.
+    unit_starts = [i.end() for i in delimiters if i.end() < point]
+
+    try:
+        # Find the start of the nth previous unit
+        new_point = unit_starts[-num]
+    except IndexError:
+        # If we are trying to go too far back, that means go to the
+        # first unit, or just the start of the buffer.
+        new_point = point_min(ihmacs_state)
+    buff.set_point(new_point)
+
+
+def forward_word(ihmacs_state, num=1):
+    """
+    Move point forward N words.
+
+    Places point at the end of a word.
+
+    A word is defined as being delimited by the mode specific word delimiters.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of words to move forward. If negative, move backwards.
+    """
+    buff = ihmacs_state.active_buff
+    major_mode = buff.major_mode
+    delimiter_regex = major_mode.word_delimiters_regex
+    forward_by_delimiter(ihmacs_state, delimiter_regex, num=num)
+
+
+def backward_word(ihmacs_state, num=1):
+    """
+    Move point backward N words.
+
+    Places point at the start of a word.
+
+    A word is defined as being delimited by the mode specific word delimiters.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: The number of words to move backward. If negative, move forwards.
+    """
+    forward_word(ihmacs_state, num=-num)
+
+
 def move_end_of_line(ihmacs_state):
     """
     Move point to start of the current line.
@@ -196,19 +304,24 @@ def move_end_of_line(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
+    # Test if we are already at the end of a line
     buff = ihmacs_state.active_buff
-    point = buff.point
     text = buff.text
-    end_of_text = point_max(ihmacs_state)
+    point = buff.point
+    try:
+        current_char = text[point]
+    except IndexError:
+        # End of File
+        current_char = "\n"
+    if current_char == "\n":
+        # We are already at the end of a line.
+        return
 
-    while point < end_of_text:
-        if text[point] == "\n":
-            break
-        point += 1
-    buff.set_point(point)
+    newline = "\n+"
+    newline_regex = re.compile(newline)
+    forward_by_delimiter(ihmacs_state, newline_regex)
 
 
-# Should rewrite with regex
 def move_beginning_of_line(ihmacs_state):
     """
     Move point to start of the current line.
@@ -216,19 +329,17 @@ def move_beginning_of_line(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
+    # Test if we are already at the start of a line
     buff = ihmacs_state.active_buff
-    point = buff.point
-    text = buff.text
-    start_of_text = point_min(ihmacs_state)
+    column = buff.column
+    if column == 0:
+        return
 
-    while point > start_of_text:
-        if text[point-1] == "\n":
-            break
-        point -= 1
-    buff.set_point(point)
+    newline = "\n+"
+    newline_regex = re.compile(newline)
+    backward_by_delimiter(ihmacs_state, newline_regex)
 
 
-# Should rewrite with regex
 def previous_line(ihmacs_state, num=1):
     """
     Move up one line.
@@ -249,22 +360,20 @@ def previous_line(ihmacs_state, num=1):
         next_line(ihmacs_state, num=-num)
         return
 
+    # Remember original column
     buff = ihmacs_state.active_buff
-    original_col = buff.column  # We try to preserve this
+    original_column = buff.column
 
-    # Move to end of previous line. Do this NUM times.
     for _ in range(num):
         move_beginning_of_line(ihmacs_state)
         backward_char(ihmacs_state)
 
-    newline_col = buff.column  # Number of columns in the current line
+    # Adjust column
+    new_column = buff.column
+    adjust_chars = max(0, new_column-original_column)
+    backward_char(ihmacs_state, adjust_chars)
 
-    # Adjust point to be in the same column
-    if original_col < newline_col:
-        backward_char(ihmacs_state, newline_col-original_col)
 
-
-# Should rewrite with regex
 def next_line(ihmacs_state, num=1):
     """
     Move down one line.
@@ -284,21 +393,19 @@ def next_line(ihmacs_state, num=1):
         previous_line(ihmacs_state, num=-num)
         return
 
+    # Remember original column
     buff = ihmacs_state.active_buff
-    original_col = buff.column  # We try to preserve this
+    original_column = buff.column
 
-    # Move to the start of next line. Do this NUM times.
     for _ in range(num):
         move_end_of_line(ihmacs_state)
         forward_char(ihmacs_state)
 
-    # Move to end of line to find the total number of columns in the line.
-    move_end_of_line(ihmacs_state)
-    newline_col = buff.column  # Number of columns in the current line
-
-    # Adjust point to be in the same column
-    if original_col < newline_col:
-        backward_char(ihmacs_state, newline_col-original_col)
+    # Adjust column
+    current_line = line_at_point(ihmacs_state)
+    current_line_len = len(current_line)
+    adjust_chars = min(original_column, current_line_len)
+    forward_char(ihmacs_state, adjust_chars)
 
 
 def scroll_up(ihmacs_state, num=1):
@@ -347,78 +454,69 @@ def scroll_down(ihmacs_state, num=1):
     scroll_up(ihmacs_state, num=-num)
 
 
-def forward_word(ihmacs_state, num=1):
+# This does not do what the actual thing-at-point function does in GNU/Emacs,
+# although it could be used as a helper function do so (or maybe
+# not). Regardless, that doesn't matter.
+def thing_at_point_regex(ihmacs_state, thing_regex):
     """
-    Move point forward N words.
+    Return the thing the point is located in that is defined by a regex.
 
-    Places point at the end of a word.
-
-    A word is defined as being delimited by the mode specific word delimiters.
+    The buffer is a string. The buffer is split into units, which are defined
+    by a regex. The thing at point is the unit which the point is located
+    within.
 
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
-        num: The number of words to move forward. If negative, move backwards.
-    """
-    if num == 0:
-        return
-    if num < 0:
-        backward_word(ihmacs_state, num=-num)
-        return
+        thing_regex: A compiled regex defining the unit delimiters.
 
+    Returns:
+        A string representing the thing at point. If point is not at a unit,
+        return the empty string.
+    """
     buff = ihmacs_state.active_buff
-    word_delimiters = buff.major_mode.word_delimiters_regex
     text = buff.text
     point = buff.point
 
-    delimiters = word_delimiters.finditer(text)
-    # Words end at the start of delimiters. Find all after point.
-    word_ends = [i.start() for i in delimiters if i.start() > point]
-
-    try:
-        # Find the end of the nth next word
-        new_point = word_ends[num-1]
-    except IndexError:
-        # If we are trying to go too far ahead, that means go to the
-        # last word, or just the end of the buffer.
-        new_point = point_max(ihmacs_state)
-    buff.set_point(new_point)
+    units = thing_regex.finditer(text)
+    for unit in units:
+        start, end = unit.span()
+        if start <= point <= end:
+            return text[start:end]
+    # Point is not at a unit
+    return ""
 
 
-def backward_word(ihmacs_state, num=1):
+def line_at_point(ihmacs_state):
     """
-    Move point backward N words.
-
-    Places point at the start of a word.
-
-    A word is defined as being delimited by the mode specific word delimiters.
+    Return the line at point.
 
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
-        num: The number of words to move backward. If negative, move forwards.
+
+    Returns:
+        A string representing the contents of the current line.
     """
-    if num == 0:
-        return
-    if num < 0:
-        forward_word(ihmacs_state, num=-num)
-        return
+    line_regex_string = "^.*$"
+    line_regex = re.compile(line_regex_string,
+                            re.MULTILINE)
+    return thing_at_point_regex(ihmacs_state, line_regex)
 
+
+def word_at_point(ihmacs_state):
+    """
+    Return the word at point.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+
+    Returns:
+        A string representing the word at which the point is located in.
+    """
     buff = ihmacs_state.active_buff
-    word_delimiters = buff.major_mode.word_delimiters_regex
-    text = buff.text
-    point = buff.point
+    major_mode = buff.major_mode
+    word_regex = major_mode.word_regex
 
-    delimiters = word_delimiters.finditer(text)
-    # Words start at the end of delimiters. Find all before point.
-    word_starts = [i.end() for i in delimiters if i.end() < point]
-
-    try:
-        # Find the start of the nth previous word
-        new_point = word_starts[-num]
-    except IndexError:
-        # If we are trying to go too far back, that means go to the
-        # first word, or just the start of the buffer.
-        new_point = point_min(ihmacs_state)
-    buff.set_point(new_point)
+    return thing_at_point_regex(ihmacs_state, word_regex)
 
 
 # The default global keymap.

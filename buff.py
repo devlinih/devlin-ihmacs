@@ -143,6 +143,14 @@ class Buffer:
         return col
 
     @property
+    def line_count(self):
+        """
+        Return the number of lines in the buffer.
+        """
+        text = self.text
+        return text.count("\n") + 1
+
+    @property
     def modeline(self):
         """
         Generate buffer specific text to place on the modeline.
@@ -164,7 +172,7 @@ class Buffer:
         else:
             modified_status = "SAVED"
         name = self.name
-        total_lines = len(self.text.split("\n"))
+        total_lines = self.line_count
         scroll_percent = round(line/total_lines * 100)
 
         left = f"{line}:{column} {modified_status}   {name}   {scroll_percent}%"
