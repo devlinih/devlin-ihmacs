@@ -3,6 +3,7 @@ Ihmacs buffer implementation.
 """
 
 from fundamental_mode import FundamentalMode
+from tree_helpers import merge_trees
 
 
 class Buffer:
@@ -48,7 +49,7 @@ class Buffer:
         if keymap is None:
             keymap = {}
         # Need to write recursive tree merge.
-        self.keymap = keymap | self.major_mode.modemap
+        self.keymap = merge_trees(keymap, self.major_mode.modemap)
 
         # Index at 1 as Emacs and every other editor does for line number.
         self._display_line = 1

@@ -9,9 +9,9 @@ MinibufferMode is primarily designed for its keymap.
 
 import re
 
-
 from buff import Buffer
 from fundamental_mode import FundamentalMode
+from tree_helpers import merge_trees
 
 
 class MinibufferMode(FundamentalMode):
@@ -77,4 +77,4 @@ class Minibuffer(Buffer):
         if keymap is None:
             keymap = {}
         # Need to write recursive merge
-        self._keymap = keymap | self._major_mode.modemap
+        self._keymap = merge_trees(keymap, self._major_mode.modemap)
