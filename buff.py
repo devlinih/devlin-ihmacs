@@ -20,13 +20,7 @@ class Buffer:
         _path: A string representing the file path on the system associated
             with the buffer. This is the file the buffer is saved to.
         major_mode: A major mode type representing the active major mode.
-        minor_modes: A list of minor modes representing the active minor
-            modes.
-        _keymap: not decided yet, but a sort of tree structure mapping inputted
-            keychords to editing methods. Are first class methods a thing or am
-            I about to put myself into a world of hell?
-        _command_history: A list of functions/methods that have been executed
-            since last save.
+        _keymap: A dictionary tree representing the keymap for the buffer.
         _display_line: An int representing which line in the buffer is to be
             displayed as the first line of a window in the view. Line number
             indexes at 1, as in, the first line is 1 not 0.
@@ -50,13 +44,12 @@ class Buffer:
         self._path = path
 
         self.major_mode = FundamentalMode()
-        self.minor_modes = []
 
         if keymap is None:
             keymap = {}
+        # Need to write recursive tree merge.
         self.keymap = keymap | self.major_mode.modemap
 
-        self._command_history = []
         # Index at 1 as Emacs and every other editor does for line number.
         self._display_line = 1
 
@@ -168,7 +161,7 @@ class Buffer:
         column = self.column
         modified = self.modified
         if modified:
-            modified_status = "-MOD-"
+            modified_status = "MODIFIED"
         else:
             modified_status = "SAVED"
         name = self.name
