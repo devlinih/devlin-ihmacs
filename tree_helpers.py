@@ -19,26 +19,142 @@ def flatten_tree(tree):
     Returns:
         A list of all the leafs in the tree.
     """
-    pass
+    # The base case, a leaf
+    if not isinstance(tree, dict):
+        # Tree is not actually a tree here.
+        return [tree]
+
+    flat_tree = []
+    for i in tree.values():
+        flat_tree += flatten_tree(i)
+    return flat_tree
 
 
-def flatten_tree_tuples(tree):
+def flatten_tree_pairs(tree, keylist=[]):
     """
-    Flatten a dictionary tree into a list of tuples.
+    Flatten a dictionary tree into a list of paths and leafs.
 
-    The tuples are pairs. The first element of the pair is a list with all the
-    keys to find the leaf. The second element of the tuple is the leaf.
+    The lists are pairs. The first element of the pair is a list with all the
+    keys to find the leaf; if a keymap is passed to this, this will be the
+    keychord. The second element of the list is the leaf; if a keymap is passed
+    to this, this will be the editing command.
+
+    An example output of this function might look like:
+    [[["C-x", "C-f"], find-file], [["C-x", "p", "f"], project-find-file]]
 
     Args:
         tree: A tree constructed from nested dictionaries.
-        keylist: A list of dictionary keys representing the path taken to reach
-            the current node.
+        keylist: A list of dictionary keys representing the path taken at each
+            node to reach the current node.
 
     Returns:
         A list of tuples representing the data stored in the tree and the path
         required to get there.
     """
-    pass
+    # The base case, a leaf
+    if not isinstance(tree, dict):
+        # Tree is not actually a tree here.
+        return [[keylist, tree]]
+
+    flat_tree = []
+    for key, val in tree.items():
+        flat_tree += flatten_tree_pairs(val, keylist + [key])
+    return flat_tree
+
+
+def flatten_nested_list(nested_list):
+    """
+    Flatten a list tree with arbitrary nesting.
+
+    Args:
+        nested_list: A list of lists (or not) to be flattened.
+
+    Returns:
+        A list without any nested lists in it, representing the flattened
+        version of the nested_list.
+    """
+    # Handle the empty list
+    if nested_list == []:
+        return []
+    # Base case: not a list
+    if not isinstance(nested_list, list):
+        return [nested_list]
+    # car/cdr recursion... am I doing exercises from a Lisp textbook?
+    return (flatten_nested_list(nested_list[0]) +
+            flatten_nested_list(nested_list[1:]))
+
+
+def list_to_dict(flat_list):
+    """
+    Unflatten a list into a dictionary.
+
+    For example, if this is passed [1, 2, 3, 4] it will return {1: {2: {3: 4}}}
+
+    Args:
+        flat_list: A list where every element is a hashable datatype that can
+            be used as dict keys.
+
+    Returns:
+        A dictionary
+    """
+    # Base case: 1 element left
+    if len(flat_list) == 1:
+        return flat_list[0]
+    return {flat_list[0]: list_to_dict(flat_list[1:])}
+
+
+def add_path_to_tree(path, tree):
+    """
+    Return result of adding a path to a tree.
+
+    Does NOT modify the existing tree, rather returns the result.
+
+    Args:
+        path: List where all but the last element are hashable datatypes that
+            can be used as dictionary keys. The last element is the leaf and
+            can be any type.
+        tree: A pre-existing tree.
+
+    Returns:
+        A dictionary tree representing the new path added to it.
+    """
+    first = path[0]
+    rest = path[1:]
+
+    # Base case, we have the last key:val pair
+    if len(path) == 2:
+        return tree | {first: rest[0]}
+
+    branch = tree.get(first)
+    if isinstance(branch, dict):
+        return tree | {first: add_path_to_tree(rest, branch)}
+
+    # If the branch does not exist yet, it's easy!
+    return tree | list_to_dict(path)
+
+
+def build_tree_from_pairs(flat_tree_pairs):
+    """
+    Build a tree from a list of lists of nodes and leafs.
+
+    This is the inverse of flatten_tree_pairs defined above.
+    `build_tree_from_pairs(flatten_tree_pairs(tree))`
+    should return the original tree.
+
+    Args:
+        flat_tree_pairs: A list of lists of a list of nodes and a leaf
+            representing a flat form of a tree. It looks like this:
+            [[[node1, node2,... nodeN], leaf],...]
+
+    Returns:
+        A nested dictionary tree.
+    """
+    paths = map(flatten_nested_list, flat_tree_pairs)
+
+    tree = {}
+    for path in paths:
+        tree = add_path_to_tree(path, tree)
+    return tree
 
 
 def replace_in_tree(tree, item, replacement):
@@ -56,7 +172,15 @@ def replace_in_tree(tree, item, replacement):
         A tree constructed of nested dictionaries with all instances of item
         replaced with replacement.
     """
-    pass
+    flat_tree = flatten_tree_pairs(tree)
+
+    new_flat_tree = []
+    for path, leaf in flat_tree:
+        if leaf == item:
+            leaf = replacement
+        new_flat_tree.append([path, leaf])
+
+    return build_tree_from_pairs(new_flat_tree)
 
 
 def merge_trees(tree1, tree2):
@@ -73,4 +197,5 @@ def merge_trees(tree1, tree2):
         A tree constructed from nested dictionaries represented the merged
         trees.
     """
-    pass
+    new_tree_flat = flatten_tree_pairs(tree1) + flatten_tree_pairs(tree2)
+    return build_tree_from_pairs(new_tree_flat)
