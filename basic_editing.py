@@ -524,7 +524,7 @@ def word_at_point(ihmacs_state):
 DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
     [[[i], self_insert_command]
      for i in ascii_letters+digits+punctuation+" "] +
-    [[["C-j"], newline],
+    [[["C-j"], newline],  # Enter
      [["DEL"], backwards_delete_char],  # Backspace
      [["KEY_DC"], delete_char],  # Delete
      [["C-d"], delete_char],
