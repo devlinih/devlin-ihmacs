@@ -11,7 +11,18 @@ import re
 
 from buff import Buffer
 from fundamental_mode import FundamentalMode
-from tree_helpers import merge_trees
+from tree_helpers import (
+    replace_in_tree,
+    merge_trees,
+    build_tree_from_pairs,
+)
+from basic_editing import (
+    command_undefined,
+    find_file,
+    newline,
+    scroll_up,
+    scroll_down,  # Add more as I create and bind them
+)
 
 
 class MinibufferMode(FundamentalMode):
@@ -22,12 +33,44 @@ class MinibufferMode(FundamentalMode):
     expand on the global keymap and the keymap provided by fundamental mode,
     minibuffer mode seeks remap commands that could potentially be dangerous
     when used in the minibuffer context.
+
+    Attributes:
+        _name: A string representing a printed name of the mode.
+        _modemap: A dictionary of dictionaries representing the modemap. This
+            is the keymap specific to the mode.
+        _word_delimiters: A list of regular expressions used to represent what
+            the word delimiters are for the given mode. This is a list because
+            it's easier to expand or delete for other modes.
     """
 
     _name = "Minibuffer"
 
-    def __init__(self):
-        pass
+    def __init__(self, keymap=None):
+        """
+        Initialize Minibuffer mode.
+
+        Args:
+            keymap: A dictionary tree representing a keymap. Is optional;
+                however, it's intended to pass the global keymap.
+        """
+        if keymap is None:
+            keymap = {}
+
+        # Unbind certain commands that when executed in the minibuffer will
+        # cause disastrous effects (GNU/Emacs doesn't do this and let me tell
+        # you, saving a minibuffer causes some weird stuff)
+        functions_to_unbind = [find_file, scroll_up, scroll_down]
+        for func in functions_to_unbind:
+            # This does not work because all the functions in
+            # functions_to_unbind point to a different place than the instances
+            # of these functions in keymap. I have no idea how to get around this.
+            keymap = replace_in_tree(keymap, func, command_undefined)
+
+        minibuffer_keymap = build_tree_from_pairs(
+            [[["C-j"], minibuffer_exit]]
+        )
+
+        self._modemap = merge_trees(keymap, minibuffer_keymap)
 
 
 class Minibuffer(Buffer):
@@ -54,10 +97,11 @@ class Minibuffer(Buffer):
         _prompt: A string representing a prompt to display at the start of the
             minibuffer.
         major_mode: A major mode type representing the minibuffer's mode.
-        _keymap: A dictionary tree representing the keymap for the minibuffer.
+        keymap: A dictionary tree representing the keymap for the minibuffer.
     """
 
-    def __init__(self, name="*minibuffer*", prompt="", keymap=None):
+    def __init__(self, name="*minibuffer*", prompt="",
+                 selections=None, keymap=None):
         """
         Initialize minibuffer instance.
 
@@ -67,14 +111,30 @@ class Minibuffer(Buffer):
                 start of the line.
             keymap: The keymap to start off with. As this is a buffer, this is
                 the global keymap passed through.
+            selections: An optional list of strings representing legal
+                completions for minibuffer input. If nothing or None is passed,
+                any string is a legal completion.
         """
         # Initialize a buffer
-        super.__init__(name="minibuffer", keymap)
+        super().__init__(name=name)
 
         self._prompt = prompt
-        self.major_mode = MinibufferMode()
+        self.major_mode = MinibufferMode(keymap=keymap)
 
         if keymap is None:
             keymap = {}
-        # Need to write recursive merge
-        self._keymap = merge_trees(keymap, self._major_mode.modemap)
+        self.keymap = merge_trees(keymap, self.major_mode.modemap)
+
+        self._selections = selections
+
+
+def minibuffer_exit(ihmacs_state):
+    """
+    Exit minibuffer input if the minibuffer contains a valid completion.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+
+    Returns: The minibuffer text.
+    """
+    pass
