@@ -21,7 +21,7 @@ class Buffer:
         _path: A string representing the file path on the system associated
             with the buffer. This is the file the buffer is saved to.
         major_mode: A major mode type representing the active major mode.
-        _keymap: A dictionary tree representing the keymap for the buffer.
+        keymap: A dictionary tree representing the keymap for the buffer.
         _display_line: An int representing which line in the buffer is to be
             displayed as the first line of a window in the view. Line number
             indexes at 1, as in, the first line is 1 not 0.
