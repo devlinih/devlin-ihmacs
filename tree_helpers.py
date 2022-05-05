@@ -4,8 +4,9 @@ Functions for working with dictionary trees.
 These are primarily designed to be used with keymap trees, but should function
 with other dictionary based trees.
 
-All of these functions are PURE! They do not cause any side effects, unlike
-basically every other function in this project.
+These functions do not cause any side effects (although some do mutate state
+within their own scope), unlike basically every other function in this project.
+Give them inputs, they will always give you the same output.
 """
 
 
@@ -91,11 +92,11 @@ def list_to_dict(flat_list):
     For example, if this is passed [1, 2, 3, 4] it will return {1: {2: {3: 4}}}
 
     Args:
-        flat_list: A list where every element is a hashable datatype that can
-            be used as dict keys.
+        flat_list: A list (tuple, or some similar iterable) where every element
+            is a hashable datatype that can be used as dict keys.
 
     Returns:
-        A dictionary
+        A nested dictionary.
     """
     # Base case: 1 element left
     if len(flat_list) == 1:
@@ -110,10 +111,10 @@ def add_path_to_tree(path, tree):
     Does NOT modify the existing tree, rather returns the result.
 
     Args:
-        path: List where all but the last element are hashable datatypes that
-            can be used as dictionary keys. The last element is the leaf and
-            can be any type.
-        tree: A pre-existing tree.
+        path: A list (or similar iterable) where all but the last element are
+            hashable datatypes that can be used as dictionary keys. The last
+            element is the leaf and can be any type.
+        tree: A dictionary tree to add an item to.
 
     Returns:
         A dictionary tree representing the new path added to it.
