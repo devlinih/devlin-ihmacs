@@ -35,7 +35,7 @@ def flatten_tree(tree):
     return flat_tree
 
 
-def flatten_tree_pairs(tree, keylist=[]):
+def flatten_tree_pairs(tree, keylist=None):
     """
     Flatten a dictionary tree into a list of paths and leafs.
 
@@ -50,12 +50,16 @@ def flatten_tree_pairs(tree, keylist=[]):
     Args:
         tree: A tree constructed from nested dictionaries.
         keylist: A list of dictionary keys representing the path taken at each
-            node to reach the current node.
+            node to reach the current node. Used for the recursive behavior.
 
     Returns:
         A list of tuples representing the data stored in the tree and the path
         required to get there.
     """
+    # Empty list is a dangerous default, so work around that
+    if keylist is None:
+        keylist = []
+
     # The base case, a leaf
     if not isinstance(tree, dict):
         # Tree is not actually a tree here.
