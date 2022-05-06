@@ -15,6 +15,7 @@ from tree_helpers import (
     replace_in_tree,
     merge_trees,
     build_tree_from_pairs,
+    docstring_equal_p,
 )
 from basic_editing import (
     command_undefined,
@@ -64,7 +65,8 @@ class MinibufferMode(FundamentalMode):
             # This does not work because all the functions in
             # functions_to_unbind point to a different place than the instances
             # of these functions in keymap. I have no idea how to get around this.
-            keymap = replace_in_tree(keymap, func, command_undefined)
+            keymap = replace_in_tree(keymap, func, command_undefined,
+                                     test=docstring_equal_p)
 
         minibuffer_keymap = build_tree_from_pairs(
             [[["C-j"], minibuffer_exit]]
