@@ -129,14 +129,36 @@ class Minibuffer(Buffer):
 
         self._selections = selections
 
+    @property
+    def selections(self):
+        """
+        Return the list of minibuffer selections.
+        """
+        return self._selections
+
 
 def minibuffer_exit(ihmacs_state):
     """
-    Exit minibuffer input if the minibuffer contains a valid completion.
+    Exit minibuffer input if the minibuffer contains a valid selection.
 
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
 
-    Returns: The minibuffer text.
+    Returns:
+        The minibuffer text. If the text is not a valid selection, return False.
     """
-    pass
+    # If this command is run, then the active buff is a minibuffer
+    buff = ihmacs_state.active_buff
+
+    text = buff.text
+    selections = buff.selections
+
+    # If there are no requires selection options
+    if len(selections) == 0:
+        return text
+
+    # Handle selections
+    if text in selections:
+        return text
+
+    return False

@@ -21,8 +21,6 @@ class Ihmacs:
         _buffers: List of all active buffers.
         _keymap: A dictionary of dictionaries representing the global keymap.
         _active_buff: An int representing the index of the active buffer.
-        _startup_directory: A string representing a path to the directory where
-            Ihmacs was started.
         keychord: A list of strings representing the current keychord being
             inputted.
         end_session: A bool representing whether or not to continue the editing
@@ -51,7 +49,6 @@ class Ihmacs:
         self._buffers = [Buffer(keymap=self._keymap,
                                 name="*scratch*")]
         self._active_buff = 0
-        self._startup_directory = "~/"  # TODO: actually make it do as labeled.
 
         # This need to be mutated by the controller and are thus public.
         self.keychord = []
@@ -89,13 +86,6 @@ class Ihmacs:
         Return the global keymap.
         """
         return self._keymap
-
-    @property
-    def startup_directory(self):
-        """
-        Return the startup directory of the editor.
-        """
-        return self._startup_directory
 
     @property
     def window(self):

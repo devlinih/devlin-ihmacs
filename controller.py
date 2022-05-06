@@ -64,22 +64,17 @@ class Controller:
 
         window.nodelay(False)
 
-        # I know comment rants are not good style, but it's kind of
-        # needed to understand why the following code is the way it is.
-
         # Convert the raw key array into a string that's human readable and
         # consistent with the keymap dictionary.
 
-        # This portion of the code assumes keypad is enabled. I gave up trying
-        # to understand exactly how the terminal input was functioning, hence
-        # went to keypad.
+        # This portion of the code assumes keypad is enabled.
 
         # Unfortunately, this results in a few issues. Here's a brief list:
         # First, ESC (as well as C-3) is treated the same as meta, just a
         # sticky keys variant of it. It sends an escape code. Second, there is
         # no difference between C-j and RET, C-i and TAB, etc. Third, don't
-        # even think about trying to decipher C- combinations that in the
-        # number row.
+        # even think about trying to decipher C- combinations in the number
+        # row.
 
         # Key was pressed with meta/ESC
         if key[0] == 27:

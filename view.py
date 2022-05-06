@@ -151,3 +151,58 @@ class View:
         window.addstr(display_line, 0, text)  # Echo at the bottom of the term
         window.clrtoeol()  # Clear any leftovers in echo area
         window.move(cursor_pos[0], cursor_pos[1])  # Restore cursor
+
+    def draw_minibuffer(self):
+        """
+        Draw the minibuffer to the last line of the window.
+
+        Args:
+            minibuffer: An instance of a minibuffer object.
+        """
+        ihmacs_state = self.ihmacs_state
+        window = ihmacs_state.window
+
+        # Get terminal size
+        term_lines, term_cols = ihmacs_state.term_size
+
+        # Minibuffer is appended to the buffer list.
+        buff = ihmacs_state.active_buff
+        text = buff.text
+        prompt = buff.prompt
+        # If prompt is too long
+        if len(prompt) >= term_cols - 1:
+            prompt = prompt[0:term_cols-1]
+
+        # The column of the point needs to account for the prompt
+        point_col = buff.column + len(prompt)
+
+
+        # Display on the last line
+        minibuffer_line = term_lines - 1
+
+        # Combine prompt and text
+        prompt_text = prompt + text
+
+        # Clear the line
+        window.move(minibuffer_line, 0)
+        window.clrtoeol()
+
+        # Figure out what section of the line to display based on length
+        # of line and position of point.
+        if len(prompt_text) < term_cols:
+            display_text = prompt_text
+        elif point_col < term_cols:
+            display_text = prompt_text[0:term_cols-1] + "$"
+        elif point_col == len(prompt_text):
+            start_index = point_col - term_cols + 2
+            display_text = "$"+prompt_text[start_index:point_col]+" "
+            point_col = term_cols-1
+        else:
+            start_index = point_col - term_cols + 2
+            text = "$"+prompt_text[start_index:point_col]+"$"
+            window.addstr(minibuffer_line, 0, text)
+            point_col = term_cols-1
+
+        # Draw and move point
+        window.addstr(minibuffer_line, 0, prompt_text)
+        window.move(minibuffer_line, point_col)
