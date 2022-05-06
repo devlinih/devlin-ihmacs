@@ -10,6 +10,9 @@ Give them inputs, they will always give you the same output.
 """
 
 
+import operator
+
+
 def flatten_tree(tree):
     """
     Flatten a dictionary tree into a list.
@@ -158,16 +161,21 @@ def build_tree_from_pairs(flat_tree_pairs):
     return tree
 
 
-def replace_in_tree(tree, item, replacement):
+def replace_in_tree(tree, item, replacement, test=operator.eq):
     """
     Replace all instances of an item in a dictionary tree.
+
+    Allows for a specifiable comparison operator via the test argument. Accepts
+    comparison operators that take two values.
 
     Args:
         tree: A tree constructed from nested dictionaries.
         item: An item in the tree to replace. Can be any datatype stored in
-            in your tree. If the leaf of the tree is equal
-            (by the == operator), it will be replaced.
+            in your tree. If the leaf of the tree is equal by the operator of
+            choice, it is replaced.
         replacement: The replacement. Can be any datatype.
+        test: A function of two arguments representing a comparison operator.
+            Defaults to operator.eq.
 
     Returns:
         A tree constructed of nested dictionaries with all instances of item
@@ -177,7 +185,7 @@ def replace_in_tree(tree, item, replacement):
 
     new_flat_tree = []
     for path, leaf in flat_tree:
-        if leaf == item:
+        if test(leaf, item):
             leaf = replacement
         new_flat_tree.append([path, leaf])
 
