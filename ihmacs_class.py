@@ -46,8 +46,8 @@ class Ihmacs:
         """
         # Global editor state
         self._keymap = DEFAULT_GLOBAL_KEYMAP
-        self._buffers = [Buffer(keymap=self._keymap,
-                                name="*scratch*")]
+        self.buffers = [Buffer(keymap=self._keymap,
+                               name="*scratch*")]
         self._active_buff = 0
 
         # This need to be mutated by the controller and are thus public.
@@ -62,13 +62,6 @@ class Ihmacs:
         self.controller = Controller(self)
 
     @property
-    def buffers(self):
-        """
-        Return the list of all buffers.
-        """
-        return self._buffers
-
-    @property
     def active_buff(self):
         """
         Return the active buffer.
@@ -78,7 +71,14 @@ class Ihmacs:
         Returns:
             A buffer object representing the active buffer.
         """
-        return self._buffers[self._active_buff]
+        return self.buffers[self._active_buff]
+
+    @property
+    def active_buff_index(self):
+        """
+        Return the index of the active buffer.
+        """
+        return self._active_buff
 
     @property
     def keymap(self):
