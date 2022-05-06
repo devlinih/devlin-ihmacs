@@ -69,7 +69,8 @@ class MinibufferMode(FundamentalMode):
                                      test=docstring_equal_p)
 
         minibuffer_keymap = build_tree_from_pairs(
-            [[["C-j"], minibuffer_exit]]
+            [[["C-j"], minibuffer_exit],
+             [["C-g"], minibuffer_quit], ]
         )
 
         self._modemap = merge_trees(keymap, minibuffer_keymap)
@@ -103,7 +104,7 @@ class Minibuffer(Buffer):
     """
 
     def __init__(self, name="*minibuffer*", prompt="",
-                 selections=None, keymap=None):
+                 selections=[], keymap=None):
         """
         Initialize minibuffer instance.
 
@@ -114,8 +115,8 @@ class Minibuffer(Buffer):
             keymap: The keymap to start off with. As this is a buffer, this is
                 the global keymap passed through.
             selections: An optional list of strings representing legal
-                completions for minibuffer input. If nothing or None is passed,
-                any string is a legal completion.
+                completions for minibuffer input. If the empty list, all inputs
+                are legal.
         """
         # Initialize a buffer
         super().__init__(name=name)
@@ -145,7 +146,7 @@ def minibuffer_exit(ihmacs_state):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
 
     Returns:
-        The minibuffer text. If the text is not a valid selection, return False.
+        The minibuffer text. If the text is not a valid selection, return None.
     """
     # If this command is run, then the active buff is a minibuffer
     buff = ihmacs_state.active_buff
@@ -161,4 +162,14 @@ def minibuffer_exit(ihmacs_state):
     if text in selections:
         return text
 
+    return None
+
+
+def minibuffer_quit(ihmacs_state):
+    """
+    Signal cancellation of minibuffer input.
+
+    Returns:
+        False
+    """
     return False
