@@ -110,6 +110,19 @@ def previous_buffer(ihmacs_state):
     ihmacs_state.switch_buffer(next_buff_index)
 
 
+def kill_buffer(ihmacs_state):
+    """
+    Kill the active buffer.
+
+    There is no going back after executing this command. The buffer is gone.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    active_buff_index = ihmacs_state.active_buff_index
+    ihmacs_state.kill_buffer(active_buff_index)
+
+
 def kill_ihmacs(ihmacs_state):
     """
     Kills the editor.
@@ -590,5 +603,6 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
      [["C-x", "C-b"], previous_buffer],  # Real Emacs runs list-buffers
+     [["C-x", "k"], kill_buffer],
      [["C-x", "C-c"], kill_ihmacs], ]
 )

@@ -67,11 +67,23 @@ class Ihmacs:
         """
         Return the active buffer.
 
-        Does NOT return the index of the active buffer.
+        Does NOT return the index of the active buffer; rather, it returns the
+        actual buffer object.
+
+        If the buffer list is empty, create a new scratch buffer and return it.
+
+        If the index is invalid, set the active buffer to be the last buffer in
+        the list.
 
         Returns:
             A buffer object representing the active buffer.
         """
+        if len(self._buffers) == 0:
+            self.create_buffer(name="*scratch*")
+
+        if self.active_buff_index >= len(self._buffers):
+            self._active_buff = len(self._buffers) - 1
+
         return self._buffers[self._active_buff]
 
     @property
@@ -143,6 +155,16 @@ class Ihmacs:
         buffer_list = self.buffers
         if 0 <= index < len(buffer_list):
             self._active_buff = index
+
+    def kill_buffer(self, index):
+        """
+        Kill the buffer at index.
+
+        If the index is invalid, do nothing.
+        """
+        buffer_list = self._buffers
+        if 0 <= index < len(buffer_list):
+            del buffer_list[index]
 
     # Main loop
 
