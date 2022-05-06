@@ -74,6 +74,42 @@ def create_buffer(ihmacs_state, name=None):
     ihmacs_state.create_buffer(name=name)
 
 
+def next_buffer(ihmacs_state):
+    """
+    Switch to the next buffer in the buffer list.
+
+    If the active buffer is the last buffer, switch to the first buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buffer_list = ihmacs_state.buffers
+    current_buff_index = ihmacs_state.active_buff_index
+    next_buff_index = current_buff_index + 1
+    if len(buffer_list) == next_buff_index:
+        next_buff_index = 0
+
+    ihmacs_state.switch_buffer(next_buff_index)
+
+
+def previous_buffer(ihmacs_state):
+    """
+    Switch to the previous buffer in the buffer list.
+
+    If the active buffer is the first buffer, switch to the last buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buffer_list = ihmacs_state.buffers
+    current_buff_index = ihmacs_state.active_buff_index
+    next_buff_index = current_buff_index - 1
+    if next_buff_index <= 0:
+        next_buff_index = len(buffer_list) - 1
+
+    ihmacs_state.switch_buffer(next_buff_index)
+
+
 def kill_ihmacs(ihmacs_state):
     """
     Kills the editor.
@@ -551,6 +587,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["M-v"], scroll_down],
      [["KEY_PPAGE"], scroll_down],
      # Extended commands
-     [["C-x", "C-f"], create_buffer],
+     [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
+     [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
+     [["C-x", "C-b"], previous_buffer],  # Real Emacs runs list-buffers
      [["C-x", "C-c"], kill_ihmacs], ]
 )

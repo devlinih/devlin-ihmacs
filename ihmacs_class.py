@@ -131,6 +131,19 @@ class Ihmacs:
         buffer_list.append(new_buffer)
         self._active_buff = len(buffer_list) - 1
 
+    def switch_buffer(self, index):
+        """
+        Switch to the buffer located at index.
+
+        If the index is invalid for the list active_buffers, do nothing.
+
+        Args:
+            index: An int representing the index of the buffer to change to.
+        """
+        buffer_list = self.buffers
+        if 0 <= index < len(buffer_list):
+            self._active_buff = index
+
     # Main loop
 
     def run(self):
