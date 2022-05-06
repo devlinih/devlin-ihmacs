@@ -11,6 +11,7 @@ Give them inputs, they will always give you the same output.
 
 
 import operator
+from inspect import getdoc
 
 
 def flatten_tree(tree):
@@ -208,3 +209,23 @@ def merge_trees(tree1, tree2):
     """
     new_tree_flat = flatten_tree_pairs(tree1) + flatten_tree_pairs(tree2)
     return build_tree_from_pairs(new_tree_flat)
+
+
+# Not a tree function, but rather a comparison operator that I will use
+# with.
+
+# This is a really bad workaround
+def docstring_equal_p(func1, func2):
+    """
+    Compare the docstrings of two functions.
+
+    Args:
+        func1: A function.
+        func2: A function.
+
+    Returns:
+        A bool representing if the docstrings are equal or not.
+    """
+    doc_func1 = getdoc(func1)
+    doc_func2 = getdoc(func2)
+    return doc_func1 == doc_func2
