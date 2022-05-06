@@ -11,6 +11,7 @@ from basic_editing import (
     command_undefined,
     DEFAULT_GLOBAL_KEYMAP,
 )
+from fundamental_mode import FundamentalMode
 
 
 class Ihmacs:
@@ -46,9 +47,9 @@ class Ihmacs:
         """
         # Global editor state
         self._keymap = DEFAULT_GLOBAL_KEYMAP
-        self.buffers = [Buffer(keymap=self._keymap,
-                               name="*scratch*")]
         self._active_buff = 0
+        self._buffers = []
+        self.create_buffer(name="*scratch*")
 
         # This need to be mutated by the controller and are thus public.
         self.keychord = []
@@ -71,7 +72,7 @@ class Ihmacs:
         Returns:
             A buffer object representing the active buffer.
         """
-        return self.buffers[self._active_buff]
+        return self._buffers[self._active_buff]
 
     @property
     def active_buff_index(self):
@@ -79,6 +80,13 @@ class Ihmacs:
         Return the index of the active buffer.
         """
         return self._active_buff
+
+    @property
+    def buffers(self):
+        """
+        Return the list of buffers.
+        """
+        return self._buffers
 
     @property
     def keymap(self):
@@ -104,6 +112,24 @@ class Ihmacs:
         Return a tuple of two ints representing the terminal size as (y, x)
         """
         return (curses.LINES, curses.COLS)
+
+    # Helper methods
+    def create_buffer(self, name="", path=""):
+        """
+        Create a new buffer and append it to the list of buffers.
+
+        Sets the active buffer index to the index of the new buffer.
+
+        Args:
+            name: The name of the new buffer.
+            major_mode: The major mode of the new buffer.
+        """
+        buffer_list = self._buffers
+        new_buffer = Buffer(name=name,
+                            path=path,
+                            keymap=self._keymap)
+        buffer_list.append(new_buffer)
+        self._active_buff = len(buffer_list) - 1
 
     # Main loop
 

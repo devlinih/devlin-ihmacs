@@ -5,13 +5,13 @@ All these functions can take custom arguments, but the first argument
 must be an Ihmacs object containing the global state of the editor.
 """
 
-
 import re
 from string import (
     ascii_letters,
     digits,
     punctuation,
 )
+from random import randrange
 
 from tree_helpers import build_tree_from_pairs
 
@@ -58,16 +58,20 @@ def message(ihmacs_state, string):
     controller.echo(string)
 
 
-# TODO: Make find_file actually open a file
-def find_file(ihmacs_state):
+def create_buffer(ihmacs_state, name=None):
     """
-    Find and open a file.
+    Create a new buffer and switch to it.
+
+    If a name is not specified, give the buffer a random name. This random name
+    is just a random 6 digit integer.
 
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    message(ihmacs_state,
-            "This would open a file, had I implemented that.")
+    if name is None:
+        name = "*"+str(randrange(100000, 999999))+"*"
+
+    ihmacs_state.create_buffer(name=name)
 
 
 def kill_ihmacs(ihmacs_state):
@@ -547,6 +551,6 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["M-v"], scroll_down],
      [["KEY_PPAGE"], scroll_down],
      # Extended commands
-     [["C-x", "C-f"], find_file],
+     [["C-x", "C-f"], create_buffer],
      [["C-x", "C-c"], kill_ihmacs], ]
 )
