@@ -483,6 +483,32 @@ def backward_word(ihmacs_state, num=1):
     forward_word(ihmacs_state, num=-num)
 
 
+def beginning_of_buffer(ihmacs_state):
+    """
+    Move point to the beginning of the buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    new_point = point_min(ihmacs_state)
+
+    buff = ihmacs_state.active_buff
+    buff.set_point(new_point)
+
+
+def end_of_buffer(ihmacs_state):
+    """
+    Move point to the beginning of the buffer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    new_point = point_max(ihmacs_state)
+
+    buff = ihmacs_state.active_buff
+    buff.set_point(new_point)
+
+
 def move_end_of_line(ihmacs_state):
     """
     Move point to start of the current line.
@@ -939,6 +965,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["M-w"], kill_ring_save],
      [["M-DEL"], backward_kill_word],
      [["M-d"], forward_kill_word],
+     [["M-<"], beginning_of_buffer],
+     [["M->"], end_of_buffer],
      # For fun
      [["C-c", "C-j"], generate_sentence_from_buffer],
      # Extended commands
