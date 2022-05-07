@@ -282,7 +282,6 @@ def point_forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
     Return the point at the location forward N units separated by a delimiter.
 
     Args:
-        Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         delimiter_regex: A compiled regex that searches for instances of the
             delimiter.
@@ -721,6 +720,45 @@ def kill_ring_save(ihmacs_state):
     kill_append(ihmacs_state, kill_text)
 
 
+def kill_forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Kill forwards N units of text separated by a delimiter.
+
+    Like forward_by_delimiter, but it kills the text.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to kill
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+
+    kill_point = point_forward_by_delimiter(ihmacs_state,
+                                            delimiter_regex,
+                                            num=num)
+    # Side effects
+    chars_to_delete = kill_point - point
+    killed_text = delete_char(ihmacs_state, num=chars_to_delete)
+    kill_append(ihmacs_state, killed_text)
+
+
+def kill_backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Kill backwards N units of text separated by a delimiter.
+
+    Like backward_by_delimiter, but it kills the text.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to kill
+    """
+    kill_forward_by_delimiter(ihmacs_state, delimiter_regex, num=-num)
+
+
 def kill_line(ihmacs_state, num=1):
     """
     Kill the rest of the current line after point.
@@ -731,23 +769,12 @@ def kill_line(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of lines to kill.
     """
-    buff = ihmacs_state.active_buff
-    point = buff.point
-
     newline = "\n+"
     newline_regex = re.compile(newline)
-    kill_point = point_forward_by_delimiter(ihmacs_state,
-                                            newline_regex,
-                                            num=num)
-
-    chars_to_delete = kill_point - point
-
-    # Side effects
-    killed_text = delete_char(ihmacs_state, num=chars_to_delete)
-    kill_append(ihmacs_state, killed_text)
+    kill_forward_by_delimiter(ihmacs_state, newline_regex, num=num)
 
 
-def backwards_kill_line(ihmacs_state, num=1):
+def backward_kill_line(ihmacs_state, num=1):
     """
     Kill the current line before point.
 
@@ -768,11 +795,18 @@ def forward_kill_word(ihmacs_state, num=1):
 
     Adds killed text to kill_ring.
 
+    Unfortunately, unlike GNU/Emacs, running this command repeatedly creates
+    a new entry in the kill ring each time instead of concatenating the
+    consecutive killed words together.
+
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of words to kill.
     """
-    pass
+    buff = ihmacs_state.active_buff
+    major_mode = buff.major_mode
+    delimiter_regex = major_mode.word_delimiters_regex
+    kill_forward_by_delimiter(ihmacs_state, delimiter_regex, num=num)
 
 
 def backward_kill_word(ihmacs_state, num=1):
@@ -783,11 +817,15 @@ def backward_kill_word(ihmacs_state, num=1):
 
     Adds killed text to kill_ring.
 
+    Unfortunately, unlike GNU/Emacs, running this command repeatedly creates
+    a new entry in the kill ring each time instead of concatenating the
+    consecutive killed words together.
+
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of words to kill.
     """
-    pass
+    forward_kill_word(ihmacs_state, num=-num)
 
 
 # The default global keymap.
@@ -822,6 +860,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["C-x", "C-x"], exchange_point_and_mark],
      [["C-w"], kill_region],
      [["M-w"], kill_ring_save],
+     [["M-DEL"], backward_kill_word],
+     [["M-d"], forward_kill_word],
      # Extended commands
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
