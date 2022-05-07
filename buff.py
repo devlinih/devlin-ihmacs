@@ -423,8 +423,5 @@ class Buffer:
             A string representing the text appended to the buffer. False if
             buffer is read only.
         """
-        if self.read_only:
-            return False
-
         self._text.append(text)
         return text
