@@ -27,7 +27,6 @@ def self_insert_command(ihmacs_state):
         A string representing the inserted text. If the buffer is read only,
         this is the empty string.
     """
-    buff = ihmacs_state.active_buff
     keychord = ihmacs_state.keychord
     # The last stroke typed in the keychord
     char = keychord[-1]
@@ -54,7 +53,7 @@ def insert(ihmacs_state, string):
     inserted_text = buff.insert(string)
 
     # Read only check
-    if inserted_text == False:
+    if inserted_text is False:
         message(ihmacs_state, f"{buff.name} is read only.")
         return ""
     return inserted_text
@@ -240,7 +239,7 @@ def delete_char(ihmacs_state, num=1):
     deleted_text = buff.delete_char(num)
 
     # Read only check
-    if deleted_text == False:
+    if deleted_text is False:
         message(ihmacs_state, f"{buff.name} is read only.")
         return ""
     return deleted_text
@@ -261,8 +260,6 @@ def backwards_delete_char(ihmacs_state, num=1):
     Returns:
         A string representing the deleted text.
     """
-    buff = ihmacs_state.active_buff
-
     # Side effects
     return delete_char(ihmacs_state, num=-num)
 
@@ -320,6 +317,8 @@ def point_max(ihmacs_state):
 
 
 # This function exists for if I were to add narrowing in the future.
+
+# pylint: disable=W0613
 def point_min(ihmacs_state):
     """
     Return the minimum allowed point of the active buffer.
@@ -503,8 +502,8 @@ def move_end_of_line(ihmacs_state):
         # We are already at the end of a line.
         return
 
-    newline = "\n+"
-    newline_regex = re.compile(newline)
+    newline_string = "\n+"
+    newline_regex = re.compile(newline_string)
     forward_by_delimiter(ihmacs_state, newline_regex)
 
 
@@ -521,8 +520,8 @@ def move_beginning_of_line(ihmacs_state):
     if column == 0:
         return
 
-    newline = "\n+"
-    newline_regex = re.compile(newline)
+    newline_string = "\n+"
+    newline_regex = re.compile(newline_string)
     backward_by_delimiter(ihmacs_state, newline_regex)
 
 
@@ -756,7 +755,7 @@ def kill_region(ihmacs_state):
     kill_text = buff.delete_region()
 
     # Read only check
-    if deleted_text == False:
+    if kill_text is False:
         message(ihmacs_state, f"{buff.name} is read only.")
         return
 
@@ -828,8 +827,8 @@ def kill_line(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of lines to kill.
     """
-    newline = "\n+"
-    newline_regex = re.compile(newline)
+    newline_string = "\n+"
+    newline_regex = re.compile(newline_string)
     kill_forward_by_delimiter(ihmacs_state, newline_regex, num=num)
 
 

@@ -6,6 +6,7 @@ from fundamental_mode import FundamentalMode
 from tree_helpers import merge_trees
 
 
+# pylint: disable=R0902, disable=R0904
 class Buffer:
     """
     Ihmacs text buffer.
@@ -220,8 +221,8 @@ class Buffer:
             A bool representing whether or not the revert was successful.
         """
         path = self.path
-        with open(path, "r") as f:
-            self._text = f.read()
+        with open(path, "r") as disk_file:
+            self._text = disk_file.read()
 
         self._point = 0
         self._mark = 0
@@ -234,8 +235,8 @@ class Buffer:
         Updates modified state to False.
         """
         path = self.path
-        with open(path, "w") as f:
-            f.write(self.text)
+        with open(path, "w") as disk_file:
+            disk_file.write(self.text)
 
         self._modified = False
 
@@ -245,8 +246,8 @@ class Buffer:
 
         Updates modified state to False.
         """
-        with open(path, "w") as f:
-            f.write(self.text)
+        with open(path, "w") as disk_file:
+            disk_file.write(self.text)
 
         self._path = path
         self._modified = False

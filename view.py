@@ -41,6 +41,7 @@ class View:
         self._draw_modeline()
         window.refresh()
 
+    # pylint: disable=R0914
     def _redraw_buffer(self):
         """
         Redraw the active buffer in the editing area.

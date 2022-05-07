@@ -33,6 +33,7 @@ class Controller:
         # The entire global state, used less frequently
         self.ihmacs_state = ihmacs_state
 
+    # pylint: disable=R0912
     def read_key(self):
         """
         Read keystroke from the user.

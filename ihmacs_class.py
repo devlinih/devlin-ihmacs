@@ -13,6 +13,7 @@ from basic_editing import (
 )
 
 
+# pylint: disable=R0902
 class Ihmacs:
     """
     Class representing top level of an Ihmacs session.
@@ -118,10 +119,9 @@ class Ihmacs:
         """
         Return terminal size.
 
-        Updates
-
         Return a tuple of two ints representing the terminal size as (y, x)
         """
+        # pylint: disable=E1101
         return (curses.LINES, curses.COLS)
 
     # Helper methods
@@ -196,6 +196,7 @@ class Ihmacs:
         for buff in buffers:
             if buff.name == name:
                 return buff
+        return None
 
     # Main loop
 
