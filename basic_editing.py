@@ -94,15 +94,24 @@ def message(ihmacs_state, string):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         string: A message to send.
     """
-    # TODO: Append to *messages*. Will do after multiple buffers and
-    # switching has been implemented.
+    buff = ihmacs_state.find_buffer("*messages*")
+    if buff is None:
+        create_buffer_no_switch(ihmacs_state,
+                                name="*messages*",
+                                read_only=True)
+        # Recursively call message again
+        message(ihmacs_state, string)
+        return
+
+    # Print to *messages*
+    buff.append(string+"\n")
 
     # Echo
     controller = ihmacs_state.controller
     controller.echo(string)
 
 
-def create_buffer(ihmacs_state, name=None):
+def create_buffer_no_switch(ihmacs_state, name=None, read_only=False):
     """
     Create a new buffer and switch to it.
 
@@ -111,11 +120,29 @@ def create_buffer(ihmacs_state, name=None):
 
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
+        name: A string representing the name of the buffer.
+        read_only: A bool representing the read only state of the new buffer.
     """
     if name is None:
         name = "*"+str(randrange(100000, 999999))+"*"
+    ihmacs_state.create_buffer_no_switch(name=name, read_only=read_only)
 
-    ihmacs_state.create_buffer(name=name)
+
+def create_buffer(ihmacs_state, name=None, read_only=False):
+    """
+    Create a new buffer and switch to it.
+
+    If a name is not specified, give the buffer a random name. This random name
+    is just a random 6 digit integer.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        name: A string representing the name of the buffer.
+        read_only: A bool representing the read only state of the new buffer.
+    """
+    if name is None:
+        name = "*"+str(randrange(100000, 999999))+"*"
+    ihmacs_state.create_buffer(name=name, read_only=read_only)
 
 
 def next_buffer(ihmacs_state):

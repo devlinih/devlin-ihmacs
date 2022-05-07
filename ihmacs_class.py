@@ -181,6 +181,22 @@ class Ihmacs:
         if 0 <= index < len(buffer_list):
             del buffer_list[index]
 
+    def find_buffer(self, name):
+        """
+        Find the first buffer whose name matches a string.
+
+        Args:
+            name: A string representing a buffer name to search for.
+
+        Returns:
+            The first buffer object in the list of buffers whose name matches
+            name. Returns None if no buffer with the name is found.
+        """
+        buffers = self._buffers
+        for buff in buffers:
+            if buff.name == name:
+                return buff
+
     # Main loop
 
     def run(self):
