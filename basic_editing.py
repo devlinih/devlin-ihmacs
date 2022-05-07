@@ -14,6 +14,7 @@ from string import (
 from random import randrange
 
 from tree_helpers import build_tree_from_pairs
+from markov import generate_sentence_from_text
 
 
 def self_insert_command(ihmacs_state):
@@ -886,11 +887,29 @@ def backward_kill_word(ihmacs_state, num=1):
     forward_kill_word(ihmacs_state, num=-num)
 
 
+def generate_sentence_from_buffer(ihmacs_state, num=1):
+    """
+    Generate and insert N random sentences based on text in buffer.
+
+    Uses a Markov chain to generate these sentences.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An integer representing the number of sentences to generate. If
+            0 or negative, generate no sentences.
+    """
+    buff = ihmacs_state.active_buff
+    text = buff.text
+
+    text_to_insert = generate_sentence_from_text(text, num=num)
+    insert(ihmacs_state, text_to_insert)
+
+
 # The default global keymap.
 DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
     [[[i], self_insert_command]
      for i in ascii_letters+digits+punctuation+" "] +
-    [[["C-j"], newline],  # Enter
+    [[["C-j"], newline],  # Enter, C-j, and C-m... thanks curses keypad
      [["DEL"], backwards_delete_char],  # Backspace
      [["KEY_DC"], delete_char],  # Delete
      [["C-d"], delete_char],
@@ -920,6 +939,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["M-w"], kill_ring_save],
      [["M-DEL"], backward_kill_word],
      [["M-d"], forward_kill_word],
+     # For fun
+     [["C-c", "C-j"], generate_sentence_from_buffer],
      # Extended commands
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
