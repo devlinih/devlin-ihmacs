@@ -42,6 +42,26 @@ def insert(ihmacs_state, string):
     buff.insert(string)
 
 
+def set_mark_command(ihmacs_state):
+    """
+    Set the mark to location of current point.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    pass
+
+
+def exchange_point_and_mark(ihmacs_state):
+    """
+    Swap the locations of point and mark.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    pass
+
+
 def message(ihmacs_state, string):
     """
     Print string in echo area and append to *messages* buffer.
@@ -159,10 +179,13 @@ def delete_char(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing how many characters to delete. The sign
             denotes the direction.
+
+    Returns:
+        A string representing the deleted text.
     """
     buff = ihmacs_state.active_buff
 
-    buff.delete_char(num)
+    return buff.delete_char(num)
 
 
 def backwards_delete_char(ihmacs_state, num=1):
@@ -176,10 +199,13 @@ def backwards_delete_char(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing how many characters to delete. The sign
             denotes the direction.
+
+    Returns:
+        A string representing the deleted text.
     """
     buff = ihmacs_state.active_buff
 
-    buff.delete_char(-num)
+    return buff.delete_char(-num)
 
 
 def newline(ihmacs_state, num=1):
@@ -245,23 +271,27 @@ def point_min(ihmacs_state):
     return 0
 
 
-def forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+def point_forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
     """
-    Move point forward by N units separated by a delimiter.
-
-    This command is used to define other commands such as forward_word.
+    Return the point at the location forward N units separated by a delimiter.
 
     Args:
+        Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         delimiter_regex: A compiled regex that searches for instances of the
             delimiter.
-        num: The number of units to move forward.
+        num: The number of units to search forward.
+
+    Returns:
+        An int representing the location of the point moved forward by N
+        delimiter separated units.
     """
     if num == 0:
-        return
+        return 0
     if num < 0:
-        backward_by_delimiter(ihmacs_state, delimiter_regex, num=-num)
-        return
+        return point_backward_by_delimiter(ihmacs_state,
+                                           delimiter_regex,
+                                           num=-num)
 
     buff = ihmacs_state.active_buff
     text = buff.text
@@ -274,10 +304,71 @@ def forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
     try:
         # Find the end of the nth next unit
         new_point = unit_ends[num-1]
+        return new_point
     except IndexError:
         # If we are trying to go too far ahead, that means we are in the
         # last unit already. Move to the end of it.
         new_point = point_max(ihmacs_state)
+        return new_point
+
+
+def point_backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Return the point at the location backward N units separated by a delimiter.
+
+    Args:
+        Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to search forward.
+
+    Returns:
+        An int representing the location of the point moved backward by N
+        delimiter separated unit.
+    """
+    if num == 0:
+        return 0
+    if num < 0:
+        return point_forward_by_delimiter(ihmacs_state,
+                                          delimiter_regex,
+                                          num=-num)
+
+    buff = ihmacs_state.active_buff
+    text = buff.text
+    point = buff.point
+
+    delimiters = delimiter_regex.finditer(text)
+    # Units start at the end of delimiters. Find all starts before point.
+    unit_starts = [i.end() for i in delimiters if i.end() < point]
+
+    try:
+        # Find the start of the nth previous unit
+        new_point = unit_starts[-num]
+        return new_point
+    except IndexError:
+        # If we are trying to go too far back, that means go to the
+        # first unit, or just the start of the buffer.
+        new_point = point_min(ihmacs_state)
+        return new_point
+
+
+def forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
+    """
+    Move point forward by N units separated by a delimiter.
+
+    This command is used to define other commands such as forward_word.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        delimiter_regex: A compiled regex that searches for instances of the
+            delimiter.
+        num: The number of units to move forward.
+    """
+    buff = ihmacs_state.active_buff
+    new_point = point_forward_by_delimiter(ihmacs_state,
+                                           delimiter_regex,
+                                           num=num)
     buff.set_point(new_point)
 
 
@@ -294,27 +385,10 @@ def backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
             delimiter.
         num: The number of units to move backward.
     """
-    if num == 0:
-        return
-    if num < 0:
-        forward_by_delimiter(ihmacs_state, delimiter_regex, num=-num)
-        return
-
     buff = ihmacs_state.active_buff
-    text = buff.text
-    point = buff.point
-
-    delimiters = delimiter_regex.finditer(text)
-    # Units start at the end of delimiters. Find all starts before point.
-    unit_starts = [i.end() for i in delimiters if i.end() < point]
-
-    try:
-        # Find the start of the nth previous unit
-        new_point = unit_starts[-num]
-    except IndexError:
-        # If we are trying to go too far back, that means go to the
-        # first unit, or just the start of the buffer.
-        new_point = point_min(ihmacs_state)
+    new_point = point_backward_by_delimiter(ihmacs_state,
+                                            delimiter_regex,
+                                            num=num)
     buff.set_point(new_point)
 
 
@@ -573,6 +647,125 @@ def word_at_point(ihmacs_state):
     return thing_at_point_regex(ihmacs_state, word_regex)
 
 
+def kill_append(ihmacs_state, text):
+    """
+    Append text to kill_ring.
+
+    If text is the empty string, does nothing.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        text: A string representing text to add to the kill ring.
+    """
+    if text == "":
+        return
+
+    kill_ring = ihmacs_state.kill_ring
+    kill_ring.append(text)
+
+
+def yank(ihmacs_state, kill=1):
+    """
+    Insert the nth most recent kill into the buffer at point.
+
+    If kill_ring is empty, print a message.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        kill: An int representing N in the Nth most recent kill.
+    """
+    kill_ring = ihmacs_state.kill_ring
+    if kill_ring == []:
+        message(ihmacs_state, "kill_ring is empty.")
+        return
+
+    if kill > len(kill_ring):
+        kill = 1
+
+    kill_text = kill_ring[-kill]
+
+    insert(ihmacs_state, kill_text)
+
+
+def kill_region(ihmacs_state):
+    """
+    Kill text in region and append to kill ring.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    pass
+
+
+def kill_line(ihmacs_state, num=1):
+    """
+    Kill the rest of the current line after point.
+
+    Adds killed text to kill_ring.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An integer representing the number of lines to kill.
+    """
+    buff = ihmacs_state.active_buff
+    point = buff.point
+
+    newline = "\n+"
+    newline_regex = re.compile(newline)
+    kill_point = point_forward_by_delimiter(ihmacs_state,
+                                            newline_regex,
+                                            num=num)
+
+    chars_to_delete = kill_point - point
+
+    # Side effects
+    killed_text = delete_char(ihmacs_state, num=chars_to_delete)
+    kill_append(ihmacs_state, killed_text)
+
+
+def backwards_kill_line(ihmacs_state, num=1):
+    """
+    Kill the current line before point.
+
+    Adds killed text to kill_ring.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An integer representing the number of lines to kill.
+    """
+    pass
+
+
+def forward_kill_word(ihmacs_state, num=1):
+    """
+    Delete up to end of word at point.
+
+    Does not delete characters in the word before point.
+
+    Adds killed text to kill_ring.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An integer representing the number of words to kill.
+    """
+    pass
+
+
+def backward_kill_word(ihmacs_state, num=1):
+    """
+    Delete up to start of word at point.
+
+    Does not delete characters in the word after point.
+
+    Adds killed text to kill_ring.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+        num: An integer representing the number of words to kill.
+    """
+    pass
+
+
 # The default global keymap.
 DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
     [[[i], self_insert_command]
@@ -599,6 +792,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["KEY_NPAGE"], scroll_up],
      [["M-v"], scroll_down],
      [["KEY_PPAGE"], scroll_down],
+     [["C-k"], kill_line],
+     [["C-y"], yank],
      # Extended commands
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
