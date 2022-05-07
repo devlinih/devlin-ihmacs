@@ -107,8 +107,6 @@ Contains the `View` class definition, which has facilities for
 displaying text buffers, the modeline, and echoing messages to the
 screen.
 
-Contains
-
 ## Hardcoding
 
 Unfortunately, there are a few hardcoded values in the code. First is
