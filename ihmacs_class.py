@@ -11,7 +11,6 @@ from basic_editing import (
     command_undefined,
     DEFAULT_GLOBAL_KEYMAP,
 )
-from fundamental_mode import FundamentalMode
 
 
 class Ihmacs:
@@ -126,7 +125,24 @@ class Ihmacs:
         return (curses.LINES, curses.COLS)
 
     # Helper methods
-    def create_buffer(self, name="", path=""):
+    def create_buffer_no_switch(self, name="", path="", read_only=False):
+        """
+        Create a new buffer and append it to the list of buffers.
+
+        Does NOT set the active buffer index to the index of the new buffer.
+
+        Args:
+            name: The name of the new buffer.
+            major_mode: The major mode of the new buffer.
+        """
+        buffer_list = self._buffers
+        new_buffer = Buffer(name=name,
+                            path=path,
+                            keymap=self._keymap,
+                            read_only=read_only)
+        buffer_list.append(new_buffer)
+
+    def create_buffer(self, name="", path="", read_only=False):
         """
         Create a new buffer and append it to the list of buffers.
 
@@ -137,10 +153,9 @@ class Ihmacs:
             major_mode: The major mode of the new buffer.
         """
         buffer_list = self._buffers
-        new_buffer = Buffer(name=name,
-                            path=path,
-                            keymap=self._keymap)
-        buffer_list.append(new_buffer)
+        self.create_buffer_no_switch(name=name,
+                                     path=path,
+                                     read_only=read_only)
         self._active_buff = len(buffer_list) - 1
 
     def switch_buffer(self, index):

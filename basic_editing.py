@@ -22,12 +22,18 @@ def self_insert_command(ihmacs_state):
 
     Args:
         ihmacs_state: The entire global Ihmacs state as an Ihmacs instance.
+
+    Returns:
+        A string representing the inserted text. If the buffer is read only,
+        this is the empty string.
     """
     buff = ihmacs_state.active_buff
     keychord = ihmacs_state.keychord
     # The last stroke typed in the keychord
     char = keychord[-1]
-    buff.insert(char)
+
+    # Side effects
+    return insert(ihmacs_state, char)
 
 
 def insert(ihmacs_state, string):
@@ -37,9 +43,21 @@ def insert(ihmacs_state, string):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         string: A string to insert into the buffer.
+
+    Returns:
+        A string representing the inserted text. If the buffer is read only,
+        this is the empty string.
     """
     buff = ihmacs_state.active_buff
-    buff.insert(string)
+
+    # Side effects
+    inserted_text = buff.insert(string)
+
+    # Read only check
+    if inserted_text == False:
+        message(ihmacs_state, f"{buff.name} is read only.")
+        return ""
+    return inserted_text
 
 
 def set_mark_command(ihmacs_state):
@@ -191,7 +209,14 @@ def delete_char(ihmacs_state, num=1):
     """
     buff = ihmacs_state.active_buff
 
-    return buff.delete_char(num)
+    # Side effects
+    deleted_text = buff.delete_char(num)
+
+    # Read only check
+    if deleted_text == False:
+        message(ihmacs_state, f"{buff.name} is read only.")
+        return ""
+    return deleted_text
 
 
 def backwards_delete_char(ihmacs_state, num=1):
@@ -211,7 +236,8 @@ def backwards_delete_char(ihmacs_state, num=1):
     """
     buff = ihmacs_state.active_buff
 
-    return buff.delete_char(-num)
+    # Side effects
+    return delete_char(ihmacs_state, num=-num)
 
 
 def newline(ihmacs_state, num=1):
@@ -701,6 +727,12 @@ def kill_region(ihmacs_state):
     """
     buff = ihmacs_state.active_buff
     kill_text = buff.delete_region()
+
+    # Read only check
+    if deleted_text == False:
+        message(ihmacs_state, f"{buff.name} is read only.")
+        return
+
     kill_append(ihmacs_state, kill_text)
 
 

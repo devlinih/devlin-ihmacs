@@ -25,9 +25,11 @@ class Buffer:
         _display_line: An int representing which line in the buffer is to be
             displayed as the first line of a window in the view. Line number
             indexes at 1, as in, the first line is 1 not 0.
+        _read_only: A bool representing if the buffer is read only or not.
     """
 
-    def __init__(self, name="**", path="", keymap=None):
+    def __init__(self, name="**", path="", keymap=None,
+                 read_only=False):
         """
         Initialize buffer instance.
 
@@ -36,6 +38,8 @@ class Buffer:
             path: Keyarg, a string representing the associated file path.
             keymap: The keymap to start off with. As this is a buffer, this is
                 the global keymap passed through.
+            read_only: A bool representing whether or not to make the new
+                buffer read only.
         """
         self._text = ""
         self._modified = False
@@ -43,6 +47,7 @@ class Buffer:
         self._mark = 0
         self._name = name
         self._path = path
+        self._read_only = read_only
 
         self.major_mode = FundamentalMode()
 
@@ -60,6 +65,13 @@ class Buffer:
         # self.revert()
 
     # Properties
+    @property
+    def read_only(self):
+        """
+        Return read only status of buffer.
+        """
+        return self._read_only
+
     @property
     def text(self):
         """
@@ -289,12 +301,18 @@ class Buffer:
 
         Updates state of _text, _point, and _mark attributes.
 
+        Does nothing if buffer is read only.
+
         Args:
             args: A tuple of strings to insert.
 
         Returns:
-            A string representing the inserted text.
+            A string representing the inserted text. Returns False if buffer
+            is read only
         """
+        if self.read_only:
+            return False
+
         point = self.point
         mark = self.mark
 
@@ -319,14 +337,19 @@ class Buffer:
 
         Updates state of _text, _point, and _mark attributes.
 
+        Does nothing if buffer is read only.
+
         Args:
             chars: Number of characters to delete. If positive, delete
                 characters after point. If negative, delete characters before
                 point.
 
         Returns:
-            A string containing the deleted text.
+            A string containing the deleted text. False if buffer is read only.
         """
+        if self.read_only:
+            return False
+
         points = (self.point, self._normalize_pos(self.point + chars))
 
         # Rearrange due to negative args
@@ -363,9 +386,15 @@ class Buffer:
 
         Updates state of _text, _point, and _mark attributes.
 
+        Does nothing if buffer is read only.
+
         Returns:
-            A string containing all the deleted text.
+            A string containing all the deleted text. False if buffer is read
+            only.
         """
+        if self.read_only:
+            return False
+
         start = min(self.point, self.mark)
         end = max(self.point, self.mark)
 
@@ -380,3 +409,22 @@ class Buffer:
 
         # Handle the return
         return deleted_text
+
+    def append(self, text):
+        """
+        Append text to buffer without modifying point or mark.
+
+        Does nothing if buffer is read only.
+
+        Args:
+            text: A string representing text to append to the buffer.
+
+        Returns:
+            A string representing the text appended to the buffer. False if
+            buffer is read only.
+        """
+        if self.read_only:
+            return False
+
+        self._text.append(text)
+        return text
