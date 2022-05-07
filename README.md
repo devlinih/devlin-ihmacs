@@ -92,7 +92,6 @@ are indicated by sending an escape character.
 And with that out of the way, here are the keybindings implemented in
 Devlin Ihmacs.
 
-|---------------------|---------------------------------|-----------------------------------------------|
 | Keychord            | Command                         | Description                                   |
 |---------------------|---------------------------------|-----------------------------------------------|
 | Alphanumeric keys   | `self_insert_command`           | Insert the typed character                    |
@@ -127,9 +126,7 @@ Devlin Ihmacs.
 | `M-d`               | `forward_kill_word`             | Kill from point to end of word                |
 | `M-<`               | `beginning_of_buffer`           | Move point to start of buffer                 |
 | `M->`               | `end_of_buffer`                 | Move point to end of buffer                   |
-|---------------------|---------------------------------|-----------------------------------------------|
 | `C-c` `C-j`         | `generate_sentence_from_buffer` | Generate random sentence based on buffer text |
-|---------------------|---------------------------------|-----------------------------------------------|
 | `C-x` `C-f`         | `create_buffer`                 | Create a new virtual buffer                   |
 | `C-x` `b`           | `next_buffer`                   | Switch to next virtual buffer                 |
 | `C-x` `C-b`         | `previous_buffer`               | Switch to previous virtual buffer             |
