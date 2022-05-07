@@ -104,7 +104,7 @@ def previous_buffer(ihmacs_state):
     buffer_list = ihmacs_state.buffers
     current_buff_index = ihmacs_state.active_buff_index
     next_buff_index = current_buff_index - 1
-    if next_buff_index <= 0:
+    if next_buff_index < 0:
         next_buff_index = len(buffer_list) - 1
 
     ihmacs_state.switch_buffer(next_buff_index)
