@@ -132,4 +132,3 @@ Devlin Ihmacs.
 | `C-x` `C-b`         | `previous_buffer`               | Switch to previous virtual buffer             |
 | `C-x` `k`           | `kill_buffer`                   | Close active buffer                           |
 | `C-x` `C-c`         | `kill_ihmacs`                   | Close the editor                              |
-|---------------------|---------------------------------|-----------------------------------------------|
