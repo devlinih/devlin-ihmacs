@@ -40,11 +40,89 @@ in front of it.
 - Major modes other than fundamental mode (no syntax highlighting or
   language specific features)
 
-- Universal argument (if you know GNU/Emacs, this will make you
+- Universal argument (if you know GNU Emacs, this will make you
   sad). That means for example that while under the hood Devlin Ihmacs
   is storing an infinite kill ring with every copy and kill operation
   you have done, it can only pull the latest kill. So effectively, there
   is no infinite clipboard even though it's storing one 🙃
+
+# Notes about the code
+
+## Files
+
+The source code is split into the following files (in alphabetical
+order):
+
+### basic_editing.py
+
+Contains all editing commands that manipulate global and buffer
+state. Also contains the definition for the default global keymap.
+
+### buff.py
+
+Contains the `Buffer` class definition, which stores the state of a text
+buffer.
+
+### `controller.py`
+
+Contains the `Controller` class definition, which has facilities to read
+keyboard input and execute editing commands.
+
+### `fundamental_mode.py`
+
+Contains the definition of `FundamentalMode` class, the only major mode
+implemented thus far in Devlin Ihmacs.
+
+### ihmacs.py
+
+Ties everything together in a way that can be executed. The purpose of
+this file is to bootstrap the editor. Running `python ihmacs.py` at the
+command line starts Devlin Ihmacs.
+
+### ihmacs_class.py
+
+Contains the definition for the `Ihmacs` class, which is used to hold
+the global state of the editor.
+
+### markov.py
+
+Contains function definitions for generating non-sense sentences via a
+Markov chain. I couldn't help myself.
+
+### ncurses_test.py
+
+A file for poking around with how ncurses handles keyboard input.
+
+### tree_helpers.py
+
+Contains function definitions for working with dictionary trees. This
+file exists to make it easier to work with keymaps. In addition, there
+is a predicate function to compare function docstrings. This is a
+workaround for having multiple instances of the same function in
+memory.
+
+### view.py
+
+Contains the `View` class definition, which has facilities for
+displaying text buffers, the modeline, and echoing messages to the
+screen.
+
+Contains
+
+## Hardcoding
+
+Unfortunately, there are a few hardcoded values in the code. First is
+the newline character `"\n"`. This string is frequently used in various
+functions. Not only is this a magic number, it also assumes a Unix file
+encoding (Windows users can cry me a river again).
+
+The ncurses view also has some hardcoded values. For example, it assumes
+the modeline is to be displayed on the second to last line, so there are
+a lot of arbitrary looking `- 2`s in the code. The view could use a
+complete rewrite using multiple ncurses windows and splitting. This
+would be cleaner, less dependent on this hardcoding, and could lead to
+multiple buffers being displayed side by side (`C-x` `2` and `C-x` `3`
+in GNU Emacs).
 
 # Installation and Usage
 
