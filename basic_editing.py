@@ -700,7 +700,25 @@ def kill_region(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    pass
+    buff = ihmacs_state.active_buff
+    kill_text = buff.delete_region()
+    kill_append(ihmacs_state, kill_text)
+
+
+def kill_ring_save(ihmacs_state):
+    """
+    Save region to kill ring, but do not kill it.
+
+    Args:
+        ihmacs_state: The global state of the editor as an Ihmacs instance.
+    """
+    buff = ihmacs_state.active_buff
+    text = buff.text
+    point = buff.point
+    mark = buff.mark
+
+    kill_text = text[point:mark]
+    kill_append(ihmacs_state, kill_text)
 
 
 def kill_line(ihmacs_state, num=1):
@@ -739,7 +757,7 @@ def backwards_kill_line(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of lines to kill.
     """
-    pass
+    kill_line(ihmacs_state, num=-num)
 
 
 def forward_kill_word(ihmacs_state, num=1):
@@ -802,6 +820,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["C-y"], yank],
      [["C- "], set_mark_command],
      [["C-x", "C-x"], exchange_point_and_mark],
+     [["C-w"], kill_region],
+     [["M-w"], kill_ring_save],
      # Extended commands
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
