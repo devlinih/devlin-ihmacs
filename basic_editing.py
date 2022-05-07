@@ -49,7 +49,9 @@ def set_mark_command(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    pass
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    buff.set_mark(point)
 
 
 def exchange_point_and_mark(ihmacs_state):
@@ -59,7 +61,11 @@ def exchange_point_and_mark(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    pass
+    buff = ihmacs_state.active_buff
+    point = buff.point
+    mark = buff.mark
+    buff.set_point(mark)
+    buff.set_mark(point)
 
 
 def message(ihmacs_state, string):
@@ -794,6 +800,8 @@ DEFAULT_GLOBAL_KEYMAP = build_tree_from_pairs(
      [["KEY_PPAGE"], scroll_down],
      [["C-k"], kill_line],
      [["C-y"], yank],
+     [["C- "], set_mark_command],
+     [["C-x", "C-x"], exchange_point_and_mark],
      # Extended commands
      [["C-x", "C-f"], create_buffer],  # Real Emacs runs find-file
      [["C-x", "b"], next_buffer],  # Real Emacs runs switch-to-buffer
