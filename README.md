@@ -33,7 +33,7 @@ in front of it.
 - Minibuffer input. As a consequence, many features such as `M-x`
   (`execute-extended-command`) are missing. In addition, commands for
   switching buffer cycle through buffers rather than interactively
-  asking the user for a buffer to switch through.
+  asking the user for a buffer to switch to.
 
 - Minor modes
 
