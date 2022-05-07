@@ -63,12 +63,12 @@ state. Also contains the definition for the default global keymap.
 Contains the `Buffer` class definition, which stores the state of a text
 buffer.
 
-### `controller.py`
+### controller.py
 
 Contains the `Controller` class definition, which has facilities to read
 keyboard input and execute editing commands.
 
-### `fundamental_mode.py`
+### fundamental_mode.py
 
 Contains the definition of `FundamentalMode` class, the only major mode
 implemented thus far in Devlin Ihmacs.
