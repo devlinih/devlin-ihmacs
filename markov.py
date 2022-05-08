@@ -18,6 +18,9 @@ def ends_sentence(word):
     Returns:
         A bool representing if the word ends a sentence.
     """
+    # Handle empty string case
+    if word == "":
+        return False
     return word[-1] in ".?!"
 
 
