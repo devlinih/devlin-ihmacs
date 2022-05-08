@@ -128,4 +128,7 @@ is pronounced exactly like "Emacs."
 I'm a student (CO 2025) at Olin College of Engineering in Needham
 Massachusetts.
 
+Devlin Ihmacs was created as my final project for Software Design in
+Spring 2022.
+
 Good talk.
