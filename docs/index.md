@@ -24,7 +24,9 @@ Check out the source code for the project
 - Around 900 source lines of code of Python 3
 
 
-# Obligatory Animated GIF Section
+# Demonstrations
+
+[Video Presentation](https://youtu.be/jot6DAXyIVg)
 
 ## General Demo
 
