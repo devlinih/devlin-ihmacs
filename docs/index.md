@@ -1,7 +1,8 @@
 # Devlin Ihmacs
 
 Devlin Ihmacs is an Emacs-like text editor implemented in Python 3. It
-is written by Devlin Ih.
+aims to reproduce the look and feel of Emacs by implementing an editing
+model based on buffers and modes.
 
 Check out the source code for the project
 [here.](https://github.com/olincollege/devlin-ihmacs)
@@ -42,7 +43,13 @@ Devlin Ihmacs has no dependencies other than Python 3 and ncurses. All
 functionality is implemented through the Python standard library
 (curses, regex). Most Linux and Unix distributions should have this
 installed. If you are on Windows with WSL, Devlin Ihmacs *should*
-run. If you are on native Windows, sorry.
+run.
+
+If you are on native Windows, sorry, Python does not include the
+curses module. It might be possible to run with slight modifications
+using [UniCurses](https://pypi.org/project/UniCurses/), although this
+has not been tested.
+
 
 ## Installation
 
