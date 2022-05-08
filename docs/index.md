@@ -26,7 +26,14 @@ Check out the source code for the project
 
 # Demonstrations
 
-[Video Presentation](https://youtu.be/jot6DAXyIVg)
+## Video Presentation
+
+<p allign=center>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jot6DAXyIVg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+</p>
+
 
 ## General Demo
 
