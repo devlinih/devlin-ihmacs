@@ -112,7 +112,7 @@ screen.
 Unfortunately, there are a few hardcoded values in the code. First is
 the newline character `"\n"`. This string is frequently used in various
 functions. Not only is this a magic number, it also assumes a Unix file
-encoding (Windows users can cry me a river again).
+encoding.
 
 The ncurses view also has some hardcoded values. For example, it assumes
 the modeline is to be displayed on the second to last line, so there are
@@ -130,7 +130,7 @@ Devlin Ihmacs has no dependencies other than Python 3 and ncurses. All
 functionality is implemented through the Python standard library
 (curses, regex). Most Linux and Unix distributions should have this
 installed. If you are on Windows with WSL, Devlin Ihmacs *should*
-run. If you are on native Windows, cry me a river 😿
+run. If you are on native Windows, sorry.
 
 ## Installation
 
