@@ -1,6 +1,9 @@
 # Devlin Ihmacs
 
-A Emacs-like text editor written in Python.
+Devlin Ihmacs is an Emacs-like text editor implemented in Python 3. It
+aims to reproduce the look and feel of Emacs by implementing an editing
+model based on buffers and modes.
+
 
 # Pronunciation
 
@@ -8,6 +11,7 @@ The name of this project is a pun on Emacs and my last name. "Ih" is
 pronounced like the letter E. Ihmacs is pronounced like Emacs. In order
 to distinguish this from other Emacsen, I threw my first name
 in front of it.
+
 
 # Features
 
@@ -23,6 +27,7 @@ in front of it.
 - Markov chain based text generation (I couldn't resist)
 
 - Around 900 source lines of code of Python 3
+
 
 ## Unfortunately Missing Features
 
@@ -46,6 +51,7 @@ in front of it.
   you have done, it can only pull the latest kill. So effectively, there
   is no infinite clipboard even though it's storing one 🙃
 
+
 # Notes about the code
 
 ## Files
@@ -53,25 +59,30 @@ in front of it.
 The source code is split into the following files (in alphabetical
 order):
 
+
 ### basic_editing.py
 
 Contains all editing commands that manipulate global and buffer
 state. Also contains the definition for the default global keymap.
+
 
 ### buff.py
 
 Contains the `Buffer` class definition, which stores the state of a text
 buffer.
 
+
 ### controller.py
 
 Contains the `Controller` class definition, which has facilities to read
 keyboard input and execute editing commands.
 
+
 ### fundamental_mode.py
 
 Contains the definition of `FundamentalMode` class, the only major mode
 implemented thus far in Devlin Ihmacs.
+
 
 ### ihmacs.py
 
@@ -79,15 +90,18 @@ Ties everything together in a way that can be executed. The purpose of
 this file is to bootstrap the editor. Running `python ihmacs.py` at the
 command line starts Devlin Ihmacs.
 
+
 ### ihmacs_class.py
 
 Contains the definition for the `Ihmacs` class, which is used to hold
 the global state of the editor.
 
+
 ### markov.py
 
 Contains function definitions for generating non-sense sentences via a
 Markov chain. I couldn't help myself.
+
 
 ### tree_helpers.py
 
@@ -97,11 +111,13 @@ is a predicate function to compare function docstrings. This is a
 workaround for having multiple instances of the same function in
 memory.
 
+
 ### view.py
 
 Contains the `View` class definition, which has facilities for
 displaying text buffers, the modeline, and echoing messages to the
 screen.
+
 
 ## Hardcoding
 
@@ -118,6 +134,7 @@ would be cleaner, less dependent on this hardcoding, and could lead to
 multiple buffers being displayed side by side (`C-x` `2` and `C-x` `3`
 in GNU Emacs).
 
+
 # Installation and Usage
 
 ## Dependencies
@@ -126,7 +143,13 @@ Devlin Ihmacs has no dependencies other than Python 3 and ncurses. All
 functionality is implemented through the Python standard library
 (curses, regex). Most Linux and Unix distributions should have this
 installed. If you are on Windows with WSL, Devlin Ihmacs *should*
-run. If you are on native Windows, sorry.
+run.
+
+If you are on native Windows, sorry, Python does not include the
+curses module. It might be possible to run with slight modifications
+using [UniCurses](https://pypi.org/project/UniCurses/), although this
+has not been tested.
+
 
 ## Installation
 
@@ -137,6 +160,7 @@ run. If you are on native Windows, sorry.
 
 3. Run `python ihmacs.py`. You will be placed into a scratch buffer. You
    can exit by typing `C-x` `C-c`.
+
 
 ## Keybindings
 
