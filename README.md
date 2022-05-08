@@ -89,10 +89,6 @@ the global state of the editor.
 Contains function definitions for generating non-sense sentences via a
 Markov chain. I couldn't help myself.
 
-### ncurses_test.py
-
-A file for poking around with how ncurses handles keyboard input.
-
 ### tree_helpers.py
 
 Contains function definitions for working with dictionary trees. This
