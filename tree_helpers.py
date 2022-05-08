@@ -101,7 +101,8 @@ def list_to_dict(flat_list):
 
     Args:
         flat_list: A list (tuple, or some similar iterable) where every element
-            is a hashable datatype that can be used as dict keys.
+            is a hashable datatype that can be used as dict keys. flat_list
+            MUST have a length of 2 or more.
 
     Returns:
         A nested dictionary.
@@ -121,7 +122,8 @@ def add_path_to_tree(path, tree):
     Args:
         path: A list (or similar iterable) where all but the last element are
             hashable datatypes that can be used as dictionary keys. The last
-            element is the leaf and can be any type.
+            element is the leaf and can be any type. Path MUST have a length of
+            2 or more.
         tree: A dictionary tree to add an item to.
 
     Returns:
