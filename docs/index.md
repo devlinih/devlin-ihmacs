@@ -25,7 +25,13 @@ Check out the source code for the project
 
 # Obligatory Animated GIF Section
 
-TODO
+## General Demo
+
+![Devlin Ihmacs demonstration](./ihmacs_demo.gif)
+
+## Markov Chain Text Generation
+
+![Markov chain text generation](./markov_demo.gif)
 
 
 # Installation
