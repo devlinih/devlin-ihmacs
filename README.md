@@ -135,7 +135,7 @@ multiple buffers being displayed side by side (`C-x` `2` and `C-x` `3`
 in GNU Emacs).
 
 
-## Unit Test
+## Unit Tests
 
 Unit tests are included for `basic_editing.py`, `buff.py`,
 `fundamental_mode.py`, `markov.py`, and `tree_helpers.py`. The functions
