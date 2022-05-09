@@ -281,7 +281,7 @@ def read_keychord_keymap(keychord, keymap):
         keymap: A dictionary representing a keymap.
 
     Returns:
-        A function representing a mapping, a the command_undefined function if
+        A function representing a mapping, the command_undefined function if
         the mapping is undefined, or False if the keychord is an incomplete
         mapping.
     """
