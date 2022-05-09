@@ -160,10 +160,12 @@ implementation of the same thing would teach you nothing.
 ## Dependencies
 
 Devlin Ihmacs has no dependencies other than Python 3 and ncurses. All
-functionality is implemented through the Python standard library
-(curses, regex). Most Linux and Unix distributions should have this
-installed. If you are on Windows with WSL, Devlin Ihmacs *should*
-run.
+functionality is implemented through the Python
+[curses](https://docs.python.org/3/library/curses.html) bindings and
+[regular expressions](https://docs.python.org/3/library/re.html), both
+of which are included in the Python standard library. Most Linux and
+Unix distributions should have everything installed. If you are on
+Windows with WSL, Devlin Ihmacs *should* run.
 
 If you are on native Windows, sorry, Python does not include the
 curses module. It might be possible to run with slight modifications
