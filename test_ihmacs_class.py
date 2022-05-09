@@ -83,7 +83,7 @@ def name(request):
     return request.param
 
 
-# active buff property
+# active buff
 def test_active_buff_return(ihmacs_state):
     """
     Test that active_buff always returns a buffer.
