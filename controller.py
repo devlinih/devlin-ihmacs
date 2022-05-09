@@ -133,7 +133,7 @@ class Controller:
         func(ihmacs_state)
 
         # Ensure point lies within a valid range of the view.
-        self.ensure_valid_point()
+        self._ensure_valid_point()
 
     def echo(self, string):
         """
@@ -145,7 +145,7 @@ class Controller:
         ihmacs_state = self.ihmacs_state
         ihmacs_state.echo = string
 
-    def ensure_valid_point(self):
+    def _ensure_valid_point(self):
         """
         Ensure point lies within a valid range of the view.
 
