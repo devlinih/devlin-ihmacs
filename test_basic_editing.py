@@ -2,6 +2,7 @@
 Unit tests for editing commands.
 """
 
+#pylint: skip-file
 
 import pytest
 

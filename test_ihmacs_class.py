@@ -7,6 +7,10 @@ higher order functions, and Python's handling of higher order function equality
 is unpredictable.
 """
 
+
+#pylint: skip-file
+
+
 import pytest
 
 from ihmacs_class import IhmacsSansCurses

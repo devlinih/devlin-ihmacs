@@ -5,6 +5,9 @@ Does not test the file IO methods as they are 1: hard to test, 2: not currently
 being used by the project.
 """
 
+
+#pylint: skip-file
+
 import pytest
 
 from buff import Buffer
@@ -275,9 +278,9 @@ def test_insert_point_read_only(buff_read_only, insert_string):
         buff_read_only: An Ihmacs buffer that is read only.
         insert_string: A string to attempt insert into the buffer.
     """
-    og_point=buff_read_only.point
+    og_point = buff_read_only.point
     buff_read_only.insert(insert_string)
-    new_point=buff_read_only.point
+    new_point = buff_read_only.point
     assert og_point == new_point
 
 
@@ -289,9 +292,9 @@ def test_insert_mark_read_only(buff_read_only, insert_string):
         buff_read_only: An Ihmacs buffer that is read only.
         insert_string: A string to attempt insert into the buffer.
     """
-    og_mark=buff_read_only.mark
+    og_mark = buff_read_only.mark
     buff_read_only.insert(insert_string)
-    new_mark=buff_read_only.mark
+    new_mark = buff_read_only.mark
     assert og_mark == new_mark
 
 
@@ -316,13 +319,13 @@ def test_delete_char_text(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_text=buff.text
+    og_text = buff.text
 
-    points=(buff.point, max(0, min(len(og_text), buff.point+chars)))
-    start=min(points)
-    end=max(points)
+    points = (buff.point, max(0, min(len(og_text), buff.point+chars)))
+    start = min(points)
+    end = max(points)
 
-    expected_text=og_text[:start] + og_text[end:]
+    expected_text = og_text[:start] + og_text[end:]
 
     # Do the delete
     buff.delete_char(chars)
@@ -340,12 +343,12 @@ def test_delete_char_point(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_point=buff.point
+    og_point = buff.point
 
     if chars < 0:
-        expected_point=max(0, og_point+chars)
+        expected_point = max(0, og_point+chars)
     else:
-        expected_point=og_point
+        expected_point = og_point
 
     # Do the delete
     buff.delete_char(chars)
@@ -370,20 +373,20 @@ def test_delete_char_mark(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_mark=buff.mark
-    og_point=buff.point
+    og_mark = buff.mark
+    og_point = buff.point
 
-    deleted=len(buff.delete_char(chars))
+    deleted = len(buff.delete_char(chars))
 
-    new_mark=buff.mark
-    new_point=buff.point
+    new_mark = buff.mark
+    new_point = buff.point
 
     if og_mark > og_point:
-        expected_mark=max(new_point, og_mark-deleted)
+        expected_mark = max(new_point, og_mark-deleted)
     elif og_mark < og_point:
-        expected_mark=min(new_point, og_mark)
+        expected_mark = min(new_point, og_mark)
     else:
-        expected_mark=new_point
+        expected_mark = new_point
 
     assert new_mark == expected_mark
 
@@ -408,14 +411,14 @@ def test_delete_char_return(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_text=buff.text
-    point=buff.point
+    og_text = buff.text
+    point = buff.point
 
-    points=(point, max(0, min(len(og_text), point+chars)))
-    start=min(points)
-    end=max(points)
+    points = (point, max(0, min(len(og_text), point+chars)))
+    start = min(points)
+    end = max(points)
 
-    delete_string=og_text[start:end]
+    delete_string = og_text[start:end]
 
     assert delete_string == buff.delete_char(chars)
 
@@ -428,9 +431,9 @@ def test_delete_char_text_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    text_og=buff_read_only.text
+    text_og = buff_read_only.text
     buff_read_only.delete_char(chars)
-    text_new=buff_read_only.text
+    text_new = buff_read_only.text
     assert text_og == text_new
 
 
@@ -442,9 +445,9 @@ def test_delete_char_point_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    og_point=buff_read_only.point
+    og_point = buff_read_only.point
     buff_read_only.delete_char(chars)
-    new_point=buff_read_only.point
+    new_point = buff_read_only.point
     assert og_point == new_point
 
 
@@ -456,9 +459,9 @@ def test_delete_char_mark_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    og_mark=buff_read_only.mark
+    og_mark = buff_read_only.mark
     buff_read_only.delete_char(chars)
-    new_mark=buff_read_only.mark
+    new_mark = buff_read_only.mark
     assert og_mark == new_mark
 
 
@@ -482,10 +485,10 @@ def test_delete_region_text(buff):
     Args:
         buff: An Ihmacs buffer.
     """
-    og_text=buff.text
-    points=(buff.point, buff.mark)
-    start=min(points)
-    end=max(points)
+    og_text = buff.text
+    points = (buff.point, buff.mark)
+    start = min(points)
+    end = max(points)
 
     expected_text=og_text[0:start] + og_text[end:]
 
