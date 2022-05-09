@@ -539,16 +539,3 @@ def test_kill_ring_save(ihmacs_state):
                     "does not insert empty string.")
     kill_ring_save(ihmacs_state)
     assert expected_kill == ihmacs_state.kill_ring[-1]
-
-
-# kill_forward_by_delimiter
-
-# kill_backward_by_delimiter
-
-# kill_line
-
-# backward_kill_line
-
-# forward_kill_word
-
-# backward_kill_word
