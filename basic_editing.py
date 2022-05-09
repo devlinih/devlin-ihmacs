@@ -798,10 +798,11 @@ def kill_ring_save(ihmacs_state):
     """
     buff = ihmacs_state.active_buff()
     text = buff.text
-    point = buff.point
-    mark = buff.mark
+    points = (buff.point, buff.mark)
+    start = min(points)
+    end = max(points)
 
-    kill_text = text[point:mark]
+    kill_text = text[start:end]
     kill_append(ihmacs_state, kill_text)
 
 
