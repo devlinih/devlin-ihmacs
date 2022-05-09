@@ -289,7 +289,7 @@ class Buffer:
                 Can be negative.
         """
         current_line = self.display_line
-        total_lines = len(self.text.split("\n"))
+        total_lines = self.line_count
 
         self._display_line = max(1, min(total_lines, current_line + lines))
 
