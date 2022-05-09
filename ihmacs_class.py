@@ -1,5 +1,9 @@
 """
 Class representing the top level of an Ihmacs session.
+
+There are two versions of the class. IhmacsSansCurses and Ihmacs. Ihmacs
+inherits from IhmacsSansCurses. Ihmacs adds curses functionality to Ihmacs,
+but cannot be tested. IhmacsSansCurses can be tested.
 """
 
 import curses
@@ -14,7 +18,7 @@ from basic_editing import (
 
 
 # pylint: disable=R0902
-class Ihmacs:
+class IhmacsSansCurses:
     """
     Class representing top level of an Ihmacs session.
 
@@ -30,19 +34,14 @@ class Ihmacs:
             For those not familiar with Emacs reading this code, this is a
             clipboard, with infinite history of copies.
         echo: A string to display in the echo area.
-        _window: The global ncurses window.
-        view: The view in the MVC architecture.
-        controller: The controller in the MVC architecture.
     """
 
-    def __init__(self, stdscr, *files):
+    def __init__(self, files):
         """
         Initialize instance of Ihmacs.
 
         Args:
-            stdscr: The main ncurses window. Argument exists so curses.wrapper
-                can pass it a window.
-            *files: A tuple of strings representing file paths to open as
+            files: A tuple of strings representing file paths to open as
                 buffers.
         """
         # Global editor state
@@ -56,11 +55,6 @@ class Ihmacs:
         self.end_session = False
         self.kill_ring = []
         self.echo = ""
-
-        # The view and controller
-        self._window = stdscr
-        self.view = View(self)
-        self.controller = Controller(self)
 
     @property
     def active_buff(self):
@@ -106,23 +100,6 @@ class Ihmacs:
         Return the global keymap.
         """
         return self._keymap
-
-    @property
-    def window(self):
-        """
-        Return the main ncurses window.
-        """
-        return self._window
-
-    @property
-    def term_size(self):
-        """
-        Return terminal size.
-
-        Return a tuple of two ints representing the terminal size as (y, x)
-        """
-        # pylint: disable=E1101
-        return (curses.LINES, curses.COLS)
 
     # Helper methods
     def create_buffer_no_switch(self, name="", path="", read_only=False):
@@ -198,7 +175,60 @@ class Ihmacs:
                 return buff
         return None
 
-    # Main loop
+
+class Ihmacs(IhmacsSansCurses):
+    """
+    Class representing top level of an Ihmacs session.
+    Attributes:
+        _buffers: List of all active buffers.
+        _keymap: A dictionary of dictionaries representing the global keymap.
+        _active_buff: An int representing the index of the active buffer.
+        keychord: A list of strings representing the current keychord being
+            inputted.
+        end_session: A bool representing whether or not to continue the editing
+            loop.
+        kill_ring: A list (as a stack) of strings representing the kill ring.
+            For those not familiar with Emacs reading this code, this is a
+            clipboard, with infinite history of copies.
+        echo: A string to display in the echo area.
+        _window: The global ncurses window.
+        view: The view in the MVC architecture.
+        controller: The controller in the MVC architecture.
+    """
+
+    def __init__(self, stdscr, *files):
+        """
+        Initialize instance of Ihmacs.
+        Args:
+            stdscr: The main ncurses window. Argument exists so curses.wrapper
+                can pass it a window.
+            *files: A tuple of strings representing file paths to open as
+                buffers.
+        """
+        # Global editor state
+        super().__init__(files)
+
+        # The view and controller
+        self._window = stdscr
+        self.view = View(self)
+        self.controller = Controller(self)
+
+    @property
+    def window(self):
+        """
+        Return the main ncurses window.
+        """
+        return self._window
+
+    @property
+    def term_size(self):
+        """
+        Return terminal size.
+
+        Return a tuple of two ints representing the terminal size as (y, x)
+        """
+        # pylint: disable=E1101
+        return (curses.LINES, curses.COLS)
 
     def run(self):
         """
