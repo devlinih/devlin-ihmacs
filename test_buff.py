@@ -69,7 +69,8 @@ insert_string_params = ["",
                         "`1234567890-=~!@#$%^&*()_+",
                         "qwertyuiop[]\\QWERTYUIOP{}|",
                         "asdfghjkl;'ASDFGHJKL:\"",
-                        "zxcvbnm,./ZXCVBNM<>?", ]
+                        "zxcvbnm,./ZXCVBNM<>?",
+                        "This\nis\nyet\nanother\nmultiline\nstring.\n", ]
 
 
 @pytest.fixture(params=insert_string_params)
@@ -81,6 +82,8 @@ def insert_string(request):
 
 
 chars_params = range(-30, 31)
+pos_params = range(-5, 100)
+lines_params = range(-10, 10)
 
 
 @pytest.fixture(params=chars_params)
@@ -89,6 +92,76 @@ def chars(request):
     Return an integer representing a number of chars to operate on.
     """
     return request.param
+
+
+@pytest.fixture(params=pos_params)
+def pos(request):
+    """
+    Return an integer representing a position in the buffer.
+    """
+    return request.param
+
+
+@pytest.fixture(params=lines_params)
+def lines(request):
+    """
+    Return an integer representing a number of lines to operate on.
+    """
+    return request.param
+
+
+# Test movement methods
+
+def test_set_point(buff, pos):
+    """
+    Test that point is correctly set in buffer.
+
+    If the pos argument lies between 0 and the length of the buffer text, the
+    new point should be equal to the pos argument.
+
+    If the pos argument does not lie within that range, the new point should be
+    0 or the length of the buffer text, whichever is closer.
+    """
+    max_point = len(buff.text)
+    expected_point = max(0, min(max_point, pos))
+
+    buff.set_point(pos)
+
+    assert expected_point == buff.point
+
+
+def test_set_mark(buff, pos):
+    """
+    Test that mark is correctly set in buffer.
+
+    If the pos argument lies between 0 and the length of the buffer text, the
+    new mark should be equal to the pos argument.
+
+    If the pos argument does not lie within that range, the new mark should be
+    0 or the length of the buffer text, whichever is closer.
+    """
+    max_mark = len(buff.text)
+    expected_mark = max(0, min(max_mark, pos))
+
+    buff.set_mark(pos)
+
+    assert expected_mark == buff.mark
+
+
+def test_scroll_buffer(buff, lines):
+    """
+    Test that buffer is scrolled by the correct number of lines.
+
+    The new display line should move by lines while still bound between 1 and
+    the line count of the buffer.
+    """
+    line_count = buff.text.count("\n") + 1
+    og_display_line = buff.display_line
+    expected_display_line = max(1, min(line_count, og_display_line+lines))
+
+    buff.scroll_buffer(lines)
+
+    assert expected_display_line == buff.display_line
 
 
 # Test Editing Methods
