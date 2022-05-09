@@ -415,7 +415,7 @@ class Buffer:
         """
         Append text to buffer without modifying point or mark.
 
-        Does nothing if buffer is read only.
+        Sets modified state to True.
 
         Args:
             text: A string representing text to append to the buffer.
@@ -424,5 +424,6 @@ class Buffer:
             A string representing the text appended to the buffer. False if
             buffer is read only.
         """
+        self._modified = True
         self._text = self._text + text
         return text
