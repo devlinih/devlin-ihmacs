@@ -135,6 +135,26 @@ multiple buffers being displayed side by side (`C-x` `2` and `C-x` `3`
 in GNU Emacs).
 
 
+## Unit Test
+
+Unit tests are included for `basic_editing.py`, `buff.py`,
+`fundamental_mode.py`, `markov.py`, and `tree_helpers.py`. The functions
+which mutate classes use fixtures to generate a very comprehensive list
+of tests (over 32000) that actually caught some mistakes of mine!. The
+tests for `markov.py` and `tree_helpers.py` were hand created, as those
+functions do not mutate state at all and are easy to test without
+obscene amounts of cases.
+
+Certain functions, classes, and methods were not tested for various
+reasons. curses applications are hard to unit test input and
+output. Functions with random behavior were not tested. Lastly, regex
+functions were not tested as they mutate the state and would thus need
+many comprehensive tests. Unfortunately, the only way to test that with
+the fixtures would be re-implementing the regex move
+commands. Unfortunately, testing a function against an identical
+implementation of the same thing would teach you nothing.
+
+
 # Installation and Usage
 
 ## Dependencies
