@@ -4,6 +4,8 @@ Devlin Ihmacs is an Emacs-like text editor implemented in Python 3. It
 aims to reproduce the look and feel of Emacs by implementing an editing
 model based on buffers and modes.
 
+[Project Site](https://olincollege.github.io/devlin-ihmacs)
+
 
 # Pronunciation
 
