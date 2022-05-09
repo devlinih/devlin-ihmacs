@@ -10,17 +10,37 @@ import pytest
 from buff import Buffer
 
 
+LOREM_IPSUM = (
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do\n"
+    "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad\n"
+    "minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip\n"
+    "ex ea commodo consequat. Duis aute irure dolor in reprehenderit in\n"
+    "voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur\n"
+    "sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt\n"
+    "mollit anim id est laborum."
+)
+
+
 # ("text", point, mark), these cases have the point and mark set at
 # beginning, mid, and end
-inital_buffer_states = [("Hello, World!", 0, 0),
-                        ("Hello, World!", 6, 0),
-                        ("Hello, World!", 13, 0),
-                        ("Hello, World!", 0, 6),
-                        ("Hello, World!", 6, 6),
-                        ("Hello, World!", 13, 6),
-                        ("Hello, World!", 0, 13),
-                        ("Hello, World!", 6, 13),
-                        ("Hello, World!", 13, 13), ]
+inital_buffer_states = [
+    # Point starts at beginning of each line in Lorem Ipsum, mark starts at
+    # either start or end.
+    (LOREM_IPSUM, 0, 0),
+    (LOREM_IPSUM, 64, 0),
+    (LOREM_IPSUM, 135, 0),
+    (LOREM_IPSUM, 207, 0),
+    (LOREM_IPSUM, 274, 0),
+    (LOREM_IPSUM, 345, 0),
+    (LOREM_IPSUM, 418, 0),
+    (LOREM_IPSUM, 0, 445),
+    (LOREM_IPSUM, 64, 445),
+    (LOREM_IPSUM, 135, 445),
+    (LOREM_IPSUM, 207, 445),
+    (LOREM_IPSUM, 274, 445),
+    (LOREM_IPSUM, 345, 445),
+    (LOREM_IPSUM, 418, 445),
+]
 
 
 @pytest.fixture(params=inital_buffer_states)
@@ -255,9 +275,9 @@ def test_insert_point_read_only(buff_read_only, insert_string):
         buff_read_only: An Ihmacs buffer that is read only.
         insert_string: A string to attempt insert into the buffer.
     """
-    og_point = buff_read_only.point
+    og_point=buff_read_only.point
     buff_read_only.insert(insert_string)
-    new_point = buff_read_only.point
+    new_point=buff_read_only.point
     assert og_point == new_point
 
 
@@ -269,9 +289,9 @@ def test_insert_mark_read_only(buff_read_only, insert_string):
         buff_read_only: An Ihmacs buffer that is read only.
         insert_string: A string to attempt insert into the buffer.
     """
-    og_mark = buff_read_only.mark
+    og_mark=buff_read_only.mark
     buff_read_only.insert(insert_string)
-    new_mark = buff_read_only.mark
+    new_mark=buff_read_only.mark
     assert og_mark == new_mark
 
 
@@ -296,13 +316,13 @@ def test_delete_char_text(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_text = buff.text
+    og_text=buff.text
 
-    points = (buff.point, max(0, min(len(og_text), buff.point+chars)))
-    start = min(points)
-    end = max(points)
+    points=(buff.point, max(0, min(len(og_text), buff.point+chars)))
+    start=min(points)
+    end=max(points)
 
-    expected_text = og_text[:start] + og_text[end:]
+    expected_text=og_text[:start] + og_text[end:]
 
     # Do the delete
     buff.delete_char(chars)
@@ -320,12 +340,12 @@ def test_delete_char_point(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_point = buff.point
+    og_point=buff.point
 
     if chars < 0:
-        expected_point = max(0, og_point+chars)
+        expected_point=max(0, og_point+chars)
     else:
-        expected_point = og_point
+        expected_point=og_point
 
     # Do the delete
     buff.delete_char(chars)
@@ -350,20 +370,20 @@ def test_delete_char_mark(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_mark = buff.mark
-    og_point = buff.point
+    og_mark=buff.mark
+    og_point=buff.point
 
-    deleted = len(buff.delete_char(chars))
+    deleted=len(buff.delete_char(chars))
 
-    new_mark = buff.mark
-    new_point = buff.point
+    new_mark=buff.mark
+    new_point=buff.point
 
     if og_mark > og_point:
-        expected_mark = max(new_point, og_mark-deleted)
+        expected_mark=max(new_point, og_mark-deleted)
     elif og_mark < og_point:
-        expected_mark = min(new_point, og_mark)
+        expected_mark=min(new_point, og_mark)
     else:
-        expected_mark = new_point
+        expected_mark=new_point
 
     assert new_mark == expected_mark
 
@@ -388,14 +408,14 @@ def test_delete_char_return(buff, chars):
         buff: An Ihmacs buffer.
         chars: An integer representing the number of chars to delete.
     """
-    og_text = buff.text
-    point = buff.point
+    og_text=buff.text
+    point=buff.point
 
-    points = (point, max(0, min(len(og_text), point+chars)))
-    start = min(points)
-    end = max(points)
+    points=(point, max(0, min(len(og_text), point+chars)))
+    start=min(points)
+    end=max(points)
 
-    delete_string = og_text[start:end]
+    delete_string=og_text[start:end]
 
     assert delete_string == buff.delete_char(chars)
 
@@ -408,9 +428,9 @@ def test_delete_char_text_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    text_og = buff_read_only.text
+    text_og=buff_read_only.text
     buff_read_only.delete_char(chars)
-    text_new = buff_read_only.text
+    text_new=buff_read_only.text
     assert text_og == text_new
 
 
@@ -422,9 +442,9 @@ def test_delete_char_point_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    og_point = buff_read_only.point
+    og_point=buff_read_only.point
     buff_read_only.delete_char(chars)
-    new_point = buff_read_only.point
+    new_point=buff_read_only.point
     assert og_point == new_point
 
 
@@ -436,9 +456,9 @@ def test_delete_char_mark_read_only(buff_read_only, chars):
         buff_read_only: An Ihmacs buffer that is read only.
         chars: An integer representing the number of chars to delete.
     """
-    og_mark = buff_read_only.mark
+    og_mark=buff_read_only.mark
     buff_read_only.delete_char(chars)
-    new_mark = buff_read_only.mark
+    new_mark=buff_read_only.mark
     assert og_mark == new_mark
 
 
@@ -462,12 +482,12 @@ def test_delete_region_text(buff):
     Args:
         buff: An Ihmacs buffer.
     """
-    og_text = buff.text
-    points = (buff.point, buff.mark)
-    start = min(points)
-    end = max(points)
+    og_text=buff.text
+    points=(buff.point, buff.mark)
+    start=min(points)
+    end=max(points)
 
-    expected_text = og_text[0:start] + og_text[end:]
+    expected_text=og_text[0:start] + og_text[end:]
 
     buff.delete_region()
 
@@ -481,12 +501,12 @@ def test_delete_region_return(buff):
     Args:
         buff: An Ihmacs buffer.
     """
-    og_text = buff.text
-    points = (buff.point, buff.mark)
-    start = min(points)
-    end = max(points)
+    og_text=buff.text
+    points=(buff.point, buff.mark)
+    start=min(points)
+    end=max(points)
 
-    expected_text = og_text[start:end]
+    expected_text=og_text[start:end]
 
     assert expected_text == buff.delete_region()
 
@@ -501,8 +521,8 @@ def test_delete_region_point(buff):
     Args:
         buff: An Ihmacs buffer.
     """
-    points = (buff.point, buff.mark)
-    expected_point = min(points)
+    points=(buff.point, buff.mark)
+    expected_point=min(points)
 
     buff.delete_region()
     assert expected_point == buff.point
@@ -518,8 +538,8 @@ def test_delete_region_mark(buff):
     Args:
         buff: An Ihmacs buffer.
     """
-    points = (buff.point, buff.mark)
-    expected_mark = min(points)
+    points=(buff.point, buff.mark)
+    expected_mark=min(points)
 
     buff.delete_region()
     assert expected_mark == buff.mark
@@ -543,9 +563,9 @@ def test_delete_region_text_read_only(buff_read_only):
     Args:
         buff_read_only: An Ihmacs buffer that is read only.
     """
-    text_og = buff_read_only.text
+    text_og=buff_read_only.text
     buff_read_only.delete_region()
-    text_new = buff_read_only.text
+    text_new=buff_read_only.text
     assert text_og == text_new
 
 
@@ -556,9 +576,9 @@ def test_delete_region_point_read_only(buff_read_only):
     Args:
         buff_read_only: An Ihmacs buffer that is read only.
     """
-    og_point = buff_read_only.point
+    og_point=buff_read_only.point
     buff_read_only.delete_region()
-    new_point = buff_read_only.point
+    new_point=buff_read_only.point
     assert og_point == new_point
 
 
@@ -569,9 +589,9 @@ def test_delete_region_mark_read_only(buff_read_only):
     Args:
         buff_read_only: An Ihmacs buffer that is read only.
     """
-    og_mark = buff_read_only.mark
+    og_mark=buff_read_only.mark
     buff_read_only.delete_region()
-    new_mark = buff_read_only.mark
+    new_mark=buff_read_only.mark
     assert og_mark == new_mark
 
 
@@ -595,8 +615,8 @@ def test_append_text(buff, insert_string):
         buff: An Ihmacs buffer.
         insert_string: A string to append to the buffer.
     """
-    og_text = buff.text
-    expected_text = og_text + insert_string
+    og_text=buff.text
+    expected_text=og_text + insert_string
     buff.append(insert_string)
     assert expected_text == buff.text
 
@@ -620,7 +640,7 @@ def test_append_point(buff, insert_string):
         buff: An Ihmacs buffer.
         insert_string: A string to append to the buffer.
     """
-    og_point = buff.point
+    og_point=buff.point
     buff.append(insert_string)
     assert og_point == buff.point
 
@@ -633,7 +653,7 @@ def test_append_mark(buff, insert_string):
         buff: An Ihmacs buffer.
         insert_string: A string to append to the buffer.
     """
-    og_mark = buff.mark
+    og_mark=buff.mark
     buff.append(insert_string)
     assert og_mark == buff.mark
 
