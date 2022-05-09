@@ -94,7 +94,7 @@ def test_active_buff_return(ihmacs_state):
     Args:
         ihmacs_state: An instance of IhmacsSansCurses.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     assert isinstance(buff, Buffer)
 
 

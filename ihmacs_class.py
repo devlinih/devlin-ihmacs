@@ -57,6 +57,27 @@ class IhmacsSansCurses:
         self.echo = ""
 
     @property
+    def active_buff_index(self):
+        """
+        Return the index of the active buffer.
+        """
+        return self._active_buff
+
+    @property
+    def buffers(self):
+        """
+        Return the list of buffers.
+        """
+        return self._buffers
+
+    @property
+    def keymap(self):
+        """
+        Return the global keymap.
+        """
+        return self._keymap
+
+    # Helper methods
     def active_buff(self):
         """
         Return the active buffer.
@@ -80,28 +101,6 @@ class IhmacsSansCurses:
 
         return self._buffers[self._active_buff]
 
-    @property
-    def active_buff_index(self):
-        """
-        Return the index of the active buffer.
-        """
-        return self._active_buff
-
-    @property
-    def buffers(self):
-        """
-        Return the list of buffers.
-        """
-        return self._buffers
-
-    @property
-    def keymap(self):
-        """
-        Return the global keymap.
-        """
-        return self._keymap
-
-    # Helper methods
     def create_buffer_no_switch(self, name="", path="", read_only=False):
         """
         Create a new buffer and append it to the list of buffers.
@@ -245,7 +244,7 @@ class Ihmacs(IhmacsSansCurses):
             view.refresh_screen()
 
             # Read input
-            keymap = self.active_buff.keymap
+            keymap = self.active_buff().keymap
 
             keychord.clear()
             func = False

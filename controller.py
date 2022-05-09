@@ -27,7 +27,7 @@ class Controller:
         """
         # Frequently used things in the controller, saved for convenience.
         self.window = ihmacs_state.window
-        self.buff = ihmacs_state.active_buff
+        self.buff = ihmacs_state.active_buff()
         self.keychord = ihmacs_state.keychord
 
         # The entire global state, used less frequently
@@ -153,7 +153,7 @@ class Controller:
         the buffer accordingly.
         """
         ihmacs_state = self.ihmacs_state
-        buff = ihmacs_state.active_buff
+        buff = ihmacs_state.active_buff()
 
         # Get terminal size
         term_lines, _ = ihmacs_state.term_size

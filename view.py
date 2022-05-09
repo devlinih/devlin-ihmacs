@@ -51,7 +51,7 @@ class View:
         """
         ihmacs_state = self.ihmacs_state
         window = ihmacs_state.window
-        buff = ihmacs_state.active_buff
+        buff = ihmacs_state.active_buff()
         # Line numbers index at 1, but Python indexes at 0.
         point_line = buff.line - 1
         point_col = buff.column
@@ -101,7 +101,7 @@ class View:
         """
         ihmacs_state = self.ihmacs_state
         window = ihmacs_state.window
-        buff = ihmacs_state.active_buff
+        buff = ihmacs_state.active_buff()
         modeline_left, modeline_right = buff.modeline
 
         # Get terminal size

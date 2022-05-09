@@ -48,7 +48,7 @@ def insert(ihmacs_state, string):
         A string representing the inserted text. If the buffer is read only,
         this is the empty string.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
 
     # Side effects
     inserted_text = buff.insert(string)
@@ -67,7 +67,7 @@ def set_mark_command(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     point = buff.point
     buff.set_mark(point)
 
@@ -79,7 +79,7 @@ def exchange_point_and_mark(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     point = buff.point
     mark = buff.mark
     buff.set_point(mark)
@@ -234,7 +234,7 @@ def delete_char(ihmacs_state, num=1):
     Returns:
         A string representing the deleted text.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
 
     # Side effects
     deleted_text = buff.delete_char(num)
@@ -286,7 +286,7 @@ def forward_char(ihmacs_state, num=1):
         num: Number of characters to move point. If negative, move point
             backwards.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     point = buff.point
     buff.set_point(point + num)
 
@@ -300,7 +300,7 @@ def backward_char(ihmacs_state, num=1):
         num: Number of characters to move point. If negative, move point
             forwards.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     point = buff.point
     buff.set_point(point - num)
 
@@ -312,7 +312,7 @@ def point_max(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     return len(text)
 
@@ -351,7 +351,7 @@ def point_forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
                                            delimiter_regex,
                                            num=-num)
 
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     point = buff.point
 
@@ -392,7 +392,7 @@ def point_backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
                                           delimiter_regex,
                                           num=-num)
 
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     point = buff.point
 
@@ -423,7 +423,7 @@ def forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
             delimiter.
         num: The number of units to move forward.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     new_point = point_forward_by_delimiter(ihmacs_state,
                                            delimiter_regex,
                                            num=num)
@@ -443,7 +443,7 @@ def backward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
             delimiter.
         num: The number of units to move backward.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     new_point = point_backward_by_delimiter(ihmacs_state,
                                             delimiter_regex,
                                             num=num)
@@ -462,7 +462,7 @@ def forward_word(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: The number of words to move forward. If negative, move backwards.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     major_mode = buff.major_mode
     delimiter_regex = major_mode.word_delimiters_regex
     forward_by_delimiter(ihmacs_state, delimiter_regex, num=num)
@@ -492,7 +492,7 @@ def beginning_of_buffer(ihmacs_state):
     """
     new_point = point_min(ihmacs_state)
 
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     buff.set_point(new_point)
 
 
@@ -505,7 +505,7 @@ def end_of_buffer(ihmacs_state):
     """
     new_point = point_max(ihmacs_state)
 
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     buff.set_point(new_point)
 
 
@@ -517,7 +517,7 @@ def move_end_of_line(ihmacs_state):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
     # Test if we are already at the end of a line
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     point = buff.point
     try:
@@ -542,7 +542,7 @@ def move_beginning_of_line(ihmacs_state):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
     # Test if we are already at the start of a line
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     column = buff.column
     if column == 0:
         return
@@ -573,7 +573,7 @@ def previous_line(ihmacs_state, num=1):
         return
 
     # Remember original column
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     original_column = buff.column
 
     for _ in range(num):
@@ -606,7 +606,7 @@ def next_line(ihmacs_state, num=1):
         return
 
     # Remember original column
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     original_column = buff.column
 
     for _ in range(num):
@@ -633,7 +633,7 @@ def scroll_up(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: The number of lines to scroll. If negative, scroll down.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     buff.scroll_buffer(num)
 
     # Get terminal size
@@ -685,7 +685,7 @@ def thing_at_point_regex(ihmacs_state, thing_regex):
         A string representing the thing at point. If point is not at a unit,
         return the empty string.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     point = buff.point
 
@@ -724,7 +724,7 @@ def word_at_point(ihmacs_state):
     Returns:
         A string representing the word at which the point is located in.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     major_mode = buff.major_mode
     word_regex = major_mode.word_regex
 
@@ -778,7 +778,7 @@ def kill_region(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     kill_text = buff.delete_region()
 
     # Read only check
@@ -796,7 +796,7 @@ def kill_ring_save(ihmacs_state):
     Args:
         ihmacs_state: The global state of the editor as an Ihmacs instance.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
     point = buff.point
     mark = buff.mark
@@ -817,7 +817,7 @@ def kill_forward_by_delimiter(ihmacs_state, delimiter_regex, num=1):
             delimiter.
         num: The number of units to kill
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     point = buff.point
 
     kill_point = point_forward_by_delimiter(ihmacs_state,
@@ -888,7 +888,7 @@ def forward_kill_word(ihmacs_state, num=1):
         ihmacs_state: The global state of the editor as an Ihmacs instance.
         num: An integer representing the number of words to kill.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     major_mode = buff.major_mode
     delimiter_regex = major_mode.word_delimiters_regex
     kill_forward_by_delimiter(ihmacs_state, delimiter_regex, num=num)
@@ -924,7 +924,7 @@ def generate_sentence_from_buffer(ihmacs_state, num=1):
         num: An integer representing the number of sentences to generate. If
             0 or negative, generate no sentences.
     """
-    buff = ihmacs_state.active_buff
+    buff = ihmacs_state.active_buff()
     text = buff.text
 
     text_to_insert = generate_sentence_from_text(text, num=num)
