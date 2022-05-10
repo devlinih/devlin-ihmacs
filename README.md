@@ -161,8 +161,8 @@ implementation of the same thing would teach you nothing.
 
 ## Dependencies
 
-Devlin Ihmacs has no dependencies other than Python 3 and ncurses. All
-functionality is implemented through the Python
+Devlin Ihmacs has no dependencies other than Python 3 (3.9 or later) and
+ncurses. All functionality is implemented through the Python
 [curses](https://docs.python.org/3/library/curses.html) bindings and
 [regular expressions](https://docs.python.org/3/library/re.html), both
 of which are included in the Python standard library. Most Linux and
