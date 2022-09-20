@@ -252,3 +252,8 @@ Devlin Ihmacs.
 | `C-x` `C-b`         | `previous_buffer`               | Switch to previous virtual buffer             |
 | `C-x` `k`           | `kill_buffer`                   | Close active buffer                           |
 | `C-x` `C-c`         | `kill_ihmacs`                   | Close the editor                              |
+
+# License
+
+Devlin Ihmacs is licensed under the MIT/Expat license. Feel free to play around
+with it if you're so inclined.
